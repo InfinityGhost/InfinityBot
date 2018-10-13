@@ -16,7 +16,7 @@ namespace InfinityBot.Commands
             await ReplyAsync(echo);
         }
 
-        [Command("announce")]
+        [Command("announce"), Summary("Creates an announcement in the current channel")]
         public async Task Announce([Remainder, Summary("The text to announce")] string text)
         {
             string x = "**Announcement** @everyone " + Environment.NewLine + text;
