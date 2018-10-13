@@ -7,9 +7,9 @@
         mc:Ignorable="d"
         Title="InfinityBot" Height="500" Width="800" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
     <Grid>
-        
+
         <!--Menu-->
-        
+
         <Menu VerticalAlignment="Top">
             <MenuItem Header="File">
                 <MenuItem Header="About..." Click="AboutShow"/>
@@ -19,13 +19,13 @@
                 <MenuItem Header="Exit" Click="ExitButton"/>
             </MenuItem>
         </Menu>
-        
+
         <!--TabControl-->
-        
+
         <TabControl Margin="0,18">
-            
+
             <!--Main Tab-->
-            
+
             <TabItem Header="Main">
                 <Grid>
                     <GroupBox Header="Terminal" Margin="0,0,0,44">
@@ -58,6 +58,13 @@
                         <TextBox x:Name="ClientID" VerticalAlignment="Center" Height="24"/>
                     </GroupBox>
                     <Button Content="Get bot invite link" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,120,0,0" Height="24" Width="100" Click="GetInvite"/>
+                    <GroupBox Header="Channels" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="350" Height="57" Margin="10,0,0,10">
+                        <Grid Margin="10,0">
+                            <Button Content="Save channels"  HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="100" Click="SaveChannels"/>
+                            <Button Content="Load channels"  HorizontalAlignment="Center" VerticalAlignment="Center" Height="24" Width="100" Click="LoadChannels"/>
+                            <Button Content="Reset channels" HorizontalAlignment="Right" VerticalAlignment="Center" Height="24" Width="100" Click="ClearChannels"/>
+                        </Grid>
+                    </GroupBox>
                 </Grid>
             </TabItem>
 
@@ -73,14 +80,14 @@
                     </GroupBox>
                 </Grid>
             </TabItem>-->
-            
+
         </TabControl>
-        
+
         <!--StatusBar-->
 
         <StatusBar VerticalAlignment="Bottom" Height="18">
             <TextBlock x:Name="Status" Margin="0,-2" Height="18"/>
         </StatusBar>
-        
+
     </Grid>
 </Window>

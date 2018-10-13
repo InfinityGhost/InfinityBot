@@ -92,9 +92,22 @@ namespace InfinityBot
 
         public async Task MessageDirect(string text, ulong channelID)
         {
-            if (client.GetChannel(channelID) is SocketTextChannel x)
+            if (client.GetChannel(channelID) is SocketTextChannel channel)
             {
-                await x.SendMessageAsync(text);
+                if (text.StartsWith("!announce"))
+                {
+                    var parameters = text.Replace("!announce ", string.Empty);
+                    string announcement = "**Announcement** @everyone " + Environment.NewLine + parameters;
+                    await channel.SendMessageAsync(announcement);
+                }
+                else
+                {
+                    await channel.SendMessageAsync(text);
+                }
+            }
+            else
+            {
+                TerminalUpdate(this, TimePrefix + "Error: Channel ID is either invalid or channel is not a text channel.");
             }
         }
 
@@ -123,6 +136,7 @@ namespace InfinityBot
         {
             var guild = client.GetGuild(GuildID);
             SocketGuildChannel[] guildChannels = guild.Channels as SocketGuildChannel[];
+            // TODO: Finish this lol
             return Task.CompletedTask;
         }
 

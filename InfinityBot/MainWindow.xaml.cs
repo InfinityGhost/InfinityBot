@@ -17,6 +17,7 @@ using System.Windows.Forms;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using System.Threading;
 using Clipboard = System.Windows.Clipboard;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace InfinityBot
 {
@@ -41,7 +42,7 @@ namespace InfinityBot
             {
                 TerminalUpdate(TimePrefix + "Ready.");
             }
-            UpdateChannelItems();
+            ClearChannels();
         }
 
         string Version = "0.1.1";
@@ -136,13 +137,13 @@ namespace InfinityBot
                 var selectedItem = Channels.SelectedItem as ComboBoxItem;
                 if (selectedItem.Tag.ToString() == "-1")
                 {
-                    await bot.ReplyToMessage((sender as System.Windows.Controls.TextBox).Text);
-                    (sender as System.Windows.Controls.TextBox).Text = string.Empty;
+                    await bot.ReplyToMessage((sender as TextBox).Text);
                 }
                 else
                 {
-                    await 
+                    await bot.MessageDirect((sender as TextBox).Text, Convert.ToUInt64(selectedItem.Tag));
                 }
+                (sender as TextBox).Text = string.Empty;
             }
         }
 
@@ -250,6 +251,46 @@ namespace InfinityBot
         void SaveDefault() => Save(Directory.GetCurrentDirectory() + @"\" + "defaults.cfg");
         void LoadDefault() => Load(Directory.GetCurrentDirectory() + @"\" + "defaults.cfg");
 
+        // Channels
+
+        void SaveChannels(object sender, RoutedEventArgs e) => SaveChannels();
+        void SaveChannels()
+        {
+            string[] fileContents = { };
+            try
+            {
+                for (int i = 0; i < channelItems.Length - 1; i++)
+                {
+                    Array.Resize(ref fileContents, fileContents.Length + 1);
+                    fileContents[fileContents.Length - 1] = channelItems[i + 1].Content.ToString() + ',' + channelItems[i + 1].Tag.ToString();
+                }
+                File.WriteAllLines(Directory.GetCurrentDirectory() + @"\" + "channels.txt", fileContents);
+            }
+            catch(Exception ex)
+            {
+                TerminalUpdate(TimePrefix + "Failed to save channels to file." + Environment.NewLine + ex.ToString());
+            }
+        }
+        
+        void LoadChannels(object sender, RoutedEventArgs e) => LoadChannels();
+        void LoadChannels()
+        {
+            ClearChannels();
+            string[] fileContents = File.ReadAllLines(Directory.GetCurrentDirectory() + @"\" + "channels.txt");
+            try
+            {
+                Array.ForEach(fileContents, item =>
+                {
+                    var x = item.Split(',');
+                    AddChannel(x[0], x[1]);
+                });
+            }
+            catch (Exception ex)
+            {
+                TerminalUpdate(TimePrefix + "Failed to load channels." + Environment.NewLine + ex.ToString());
+            }
+        }
+
         #endregion
 
         #region Menu Buttons
@@ -284,21 +325,11 @@ namespace InfinityBot
 
         #region Channels Combobox
 
-        ComboBoxItem[] channelItems =
-        {
-            new ComboBoxItem
-            {
-                Content = "reply",
-                Tag = "-1",
-            },
-        };
+        ComboBoxItem[] channelItems = { };
 
         void UpdateChannelItems()
         {
-            for (int i = 0; i < Channels.Items.Count; i++)
-            {
-                Channels.Items.Remove(i);
-            }
+            Channels.Items.Clear();
             Array.ForEach(channelItems, item => Channels.Items.Add(item));
             Channels.SelectedIndex = 0;
         }
@@ -314,7 +345,20 @@ namespace InfinityBot
             UpdateChannelItems();
         }
 
-
+        void ClearChannels(object sender, RoutedEventArgs e) => ClearChannels();
+        void ClearChannels()
+        {
+            ComboBoxItem[] x =
+            {
+                new ComboBoxItem
+                {
+                    Content = "- Reply in recent msg channel -",
+                    Tag = "-1",
+                },
+            };
+            channelItems = x;
+            UpdateChannelItems();
+        }
 
         #endregion
     }
