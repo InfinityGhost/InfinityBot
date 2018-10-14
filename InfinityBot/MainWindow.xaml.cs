@@ -14,10 +14,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using System.Threading;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Clipboard = System.Windows.Clipboard;
 using TextBox = System.Windows.Controls.TextBox;
+using Discord.WebSocket;
 
 namespace InfinityBot
 {
@@ -33,16 +34,18 @@ namespace InfinityBot
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            ClearChannels();
             try
             {
                 LoadDefault();
+                LoadChannels();
                 TerminalUpdate(TimePrefix + "Ready. Default settings loaded.");
             }
             catch
             {
                 TerminalUpdate(TimePrefix + "Ready.");
             }
-            ClearChannels();
+            
         }
 
         string Version = "0.1.1";
@@ -59,6 +62,7 @@ namespace InfinityBot
                 StartButton.Content = "Stop Bot";
                 bot = new Bot(APIToken.Text);
                 bot.TerminalUpdate += TerminalUpdate;
+                bot.AddGuildRequested += GetChannels;
                 if (bot.MainAsync() == Task.CompletedTask)
                 {
                     StartButton.Content = "Start Bot";
@@ -134,16 +138,37 @@ namespace InfinityBot
         {
             if (e.Key == Key.Enter)
             {
-                var selectedItem = Channels.SelectedItem as ComboBoxItem;
-                if (selectedItem.Tag.ToString() == "-1")
+                try
                 {
-                    await bot.ReplyToMessage((sender as TextBox).Text);
+                    var selectedItem = Channels.SelectedItem as ComboBoxItem;
+                    if (selectedItem.Tag.ToString() == "-1")
+                    {
+                        try
+                        {
+                            await bot.ReplyToMessage((sender as TextBox).Text);
+                        }
+                        catch(Exception ex)
+                        {
+                            TerminalUpdate(TimePrefix + ex.ToString());
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            await bot.MessageDirect((sender as TextBox).Text, Convert.ToUInt64(selectedItem.Tag));
+                        }
+                        catch(Exception ex)
+                        {
+                            TerminalUpdate(TimePrefix + ex.ToString());
+                        }
+                    }
+                    (sender as TextBox).Text = string.Empty;
                 }
-                else
+                catch(Discord.Net.HttpException)
                 {
-                    await bot.MessageDirect((sender as TextBox).Text, Convert.ToUInt64(selectedItem.Tag));
+                    TerminalUpdate(TimePrefix + "Error: Failed to send due to lack of permissions.");
                 }
-                (sender as TextBox).Text = string.Empty;
             }
         }
 
@@ -285,10 +310,7 @@ namespace InfinityBot
                     AddChannel(x[0], x[1]);
                 });
             }
-            catch (Exception ex)
-            {
-                TerminalUpdate(TimePrefix + "Failed to load channels." + Environment.NewLine + ex.ToString());
-            }
+            catch { }
         }
 
         #endregion
@@ -320,7 +342,6 @@ namespace InfinityBot
             TerminalUpdate(TimePrefix + "Copied link to clipboard: " + x);
         }
 
-
         #endregion
 
         #region Channels Combobox
@@ -344,6 +365,7 @@ namespace InfinityBot
             };
             UpdateChannelItems();
         }
+        void AddChannel(string name, ulong id) => AddChannel(name, id.ToString());
 
         void ClearChannels(object sender, RoutedEventArgs e) => ClearChannels();
         void ClearChannels()
@@ -359,6 +381,17 @@ namespace InfinityBot
             channelItems = x;
             UpdateChannelItems();
         }
+
+        void GetChannels(string guildID)
+        {
+            var x = bot.GetChannels(Convert.ToUInt64(guildID));
+            Array.ForEach(x, item =>
+            {
+                AddChannel(item.Name, item.Id);
+            });
+        }
+
+        private void GetChannels(object sender, string e) => GetChannels(e);
 
         #endregion
     }

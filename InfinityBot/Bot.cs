@@ -79,14 +79,34 @@ namespace InfinityBot
 
         public async Task ReplyToMessage(string text)
         {
-            try
+            if (text.StartsWith("!addguild"))
             {
-                await lastMessage.Channel.SendMessageAsync(text);
+                var parameters = text.Replace("!addguild ", string.Empty);
+                AddGuildRequested(this, parameters);
             }
-            catch
+            else if (text.StartsWith("!getid"))
             {
-                TerminalUpdate(this, TimePrefix + "Error: Message failed to send; No channel to reply to.");
-                return;
+                var x = lastMessage.Channel as SocketGuildChannel;
+                try
+                {
+                    TerminalUpdate(this, TimePrefix + x.Guild.Name + " ID:" + x.Id.ToString());
+                }
+                catch
+                {
+                    TerminalUpdate(this, TimePrefix + "Error: No recent message.");
+                }
+            }
+            else
+            {
+                try
+                {
+                    await lastMessage.Channel.SendMessageAsync(text);
+                }
+                catch
+                {
+                    TerminalUpdate(this, TimePrefix + "Error: Message failed to send; No channel to reply to.");
+                    return;
+                }
             }
         }
 
@@ -99,6 +119,11 @@ namespace InfinityBot
                     var parameters = text.Replace("!announce ", string.Empty);
                     string announcement = "**Announcement** @everyone " + Environment.NewLine + parameters;
                     await channel.SendMessageAsync(announcement);
+                }
+                else if (text.StartsWith("!addguild"))
+                {
+                    var parameters = text.Replace("!addguild ", string.Empty);
+                    AddGuildRequested(this, parameters);
                 }
                 else
                 {
@@ -132,13 +157,20 @@ namespace InfinityBot
 
         #region Channels
 
-        private Task GetChannels(ulong GuildID)
+        public SocketGuildChannel[] GetChannels(ulong guildID)
         {
-            var guild = client.GetGuild(GuildID);
-            SocketGuildChannel[] guildChannels = guild.Channels as SocketGuildChannel[];
-            // TODO: Finish this lol
-            return Task.CompletedTask;
+            var guild = client.GetGuild(guildID);
+            if (guild.Channels is SocketTextChannel[] x)
+            {
+                return x;
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
+            
         }
+        public event EventHandler<string> AddGuildRequested;
 
         #endregion
 
@@ -163,7 +195,7 @@ namespace InfinityBot
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
             // Determine if the message is a command, based on if it starts with '!' or a mention prefix
-            if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(client.CurrentUser, ref argPos)))
+            if (!(message.HasCharPrefix('$', ref argPos) || message.HasMentionPrefix(client.CurrentUser, ref argPos)))
             {
                 return;
             }
@@ -171,7 +203,6 @@ namespace InfinityBot
             var context = new CommandContext(client, message);
             // Execute the command. (result does not indicate a return value, 
             // rather an object stating if the command executed successfully)
-            await message.DeleteAsync();
             var result = await commands.ExecuteAsync(context, argPos, services);
             if (!result.IsSuccess)
                 await context.Channel.SendMessageAsync(result.ErrorReason);
