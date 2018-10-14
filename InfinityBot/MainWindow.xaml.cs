@@ -158,6 +158,10 @@ namespace InfinityBot
                         {
                             await bot.MessageDirect((sender as TextBox).Text, Convert.ToUInt64(selectedItem.Tag));
                         }
+                        catch (Discord.Net.HttpException)
+                        {
+                            TerminalUpdate(TimePrefix + "Unable to send message due to lack of permissions.");
+                        }
                         catch(Exception ex)
                         {
                             TerminalUpdate(TimePrefix + ex.ToString());
@@ -352,6 +356,7 @@ namespace InfinityBot
         {
             Channels.Items.Clear();
             Array.ForEach(channelItems, item => Channels.Items.Add(item));
+            Array.Sort(channelItems, (x, y) => string.Compare(x.Name.Substring(x.Name.IndexOf('#') + 1), y.Name.Substring(y.Name.IndexOf('#') + 1)));
             Channels.SelectedIndex = 0;
         }
 
@@ -382,16 +387,17 @@ namespace InfinityBot
             UpdateChannelItems();
         }
 
-        void GetChannels(string guildID)
+        private void GetChannels(object sender, ulong e)
         {
-            var x = bot.GetChannels(Convert.ToUInt64(guildID));
+            var x = bot.GetChannels(e);
             Array.ForEach(x, item =>
             {
-                AddChannel(item.Name, item.Id);
+                if (item != null)
+                {
+                    AddChannel(item.Guild.Name + "/#" + item.Name, item.Id);
+                }
             });
         }
-
-        private void GetChannels(object sender, string e) => GetChannels(e);
 
         #endregion
     }

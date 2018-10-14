@@ -233,6 +233,7 @@
     </Compile>
     <Compile Include="Bot.cs" />
     <Compile Include="Commands\Commands.cs" />
+    <Compile Include="Commands\ServerCommands.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

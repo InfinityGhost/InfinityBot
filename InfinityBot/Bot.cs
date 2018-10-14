@@ -81,8 +81,7 @@ namespace InfinityBot
         {
             if (text.StartsWith("!addguild"))
             {
-                var parameters = text.Replace("!addguild ", string.Empty);
-                AddGuildRequested(this, parameters);
+                AddGuildCommand(text);
             }
             else if (text.StartsWith("!getid"))
             {
@@ -116,14 +115,13 @@ namespace InfinityBot
             {
                 if (text.StartsWith("!announce"))
                 {
-                    var parameters = text.Replace("!announce ", string.Empty);
+                    var parameters = text.Substring(text.IndexOf(' '));
                     string announcement = "**Announcement** @everyone " + Environment.NewLine + parameters;
                     await channel.SendMessageAsync(announcement);
                 }
                 else if (text.StartsWith("!addguild"))
                 {
-                    var parameters = text.Replace("!addguild ", string.Empty);
-                    AddGuildRequested(this, parameters);
+                    AddGuildCommand(text);
                 }
                 else
                 {
@@ -134,6 +132,15 @@ namespace InfinityBot
             {
                 TerminalUpdate(this, TimePrefix + "Error: Channel ID is either invalid or channel is not a text channel.");
             }
+        }
+
+        private void AddGuildCommand(string text)
+        {
+            var parameters = text.Substring(text.IndexOf(' '));
+            var guildID = Convert.ToUInt64(parameters);
+            var guildInfo = client.GetGuild(guildID);
+            TerminalUpdate(this, TimePrefix + "Added all text channels from guild " + "\"" + guildInfo.Name + "\".");
+            AddGuildRequested(this, guildID);
         }
 
         #endregion
@@ -160,17 +167,21 @@ namespace InfinityBot
         public SocketGuildChannel[] GetChannels(ulong guildID)
         {
             var guild = client.GetGuild(guildID);
-            if (guild.Channels is SocketTextChannel[] x)
+            var textChannels = guild.Channels.ToArray() as SocketChannel[];
+            SocketTextChannel[] channels = { };
+            Array.ForEach(textChannels, item =>
             {
-                return x;
-            }
-            else
-            {
-                throw new ArgumentException();
-            }
-            
+                if (item is SocketTextChannel x)
+                {
+                    Array.Resize(ref channels, channels.Length + 1);
+                    channels[channels.Length - 1] = x;
+                }
+            });
+            return channels;
+
+            //throw new NotImplementedException();
         }
-        public event EventHandler<string> AddGuildRequested;
+        public event EventHandler<ulong> AddGuildRequested;
 
         #endregion
 
