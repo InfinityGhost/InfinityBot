@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace InfinityBot
 {
@@ -79,20 +80,15 @@ namespace InfinityBot
 
         public async Task ReplyToMessage(string text)
         {
-            if (text.StartsWith("!addguild"))
+            if (text.StartsWith("!"))
             {
-                AddGuildCommand(text);
-            }
-            else if (text.StartsWith("!getid"))
-            {
-                var x = lastMessage.Channel as SocketGuildChannel;
-                try
+                if(lastMessage != null)
                 {
-                    TerminalUpdate(this, TimePrefix + x.Guild.Name + " ID:" + x.Id.ToString());
+                    await ServerCommand(text, lastMessage.Channel as SocketTextChannel);
                 }
-                catch
+                else
                 {
-                    TerminalUpdate(this, TimePrefix + "Error: No recent message.");
+                    await ServerCommand(text, null);
                 }
             }
             else
@@ -113,15 +109,9 @@ namespace InfinityBot
         {
             if (client.GetChannel(channelID) is SocketTextChannel channel)
             {
-                if (text.StartsWith("!announce"))
+                if (text.StartsWith("!"))
                 {
-                    var parameters = text.Substring(text.IndexOf(' '));
-                    string announcement = "**Announcement** @everyone " + Environment.NewLine + parameters;
-                    await channel.SendMessageAsync(announcement);
-                }
-                else if (text.StartsWith("!addguild"))
-                {
-                    AddGuildCommand(text);
+                    await ServerCommand(text, channel);
                 }
                 else
                 {
@@ -132,15 +122,6 @@ namespace InfinityBot
             {
                 TerminalUpdate(this, TimePrefix + "Error: Channel ID is either invalid or channel is not a text channel.");
             }
-        }
-
-        private void AddGuildCommand(string text)
-        {
-            var parameters = text.Substring(text.IndexOf(' '));
-            var guildID = Convert.ToUInt64(parameters);
-            var guildInfo = client.GetGuild(guildID);
-            TerminalUpdate(this, TimePrefix + "Added all text channels from guild " + "\"" + guildInfo.Name + "\".");
-            AddGuildRequested(this, guildID);
         }
 
         #endregion
@@ -183,6 +164,19 @@ namespace InfinityBot
         }
         public event EventHandler<ulong> AddGuildRequested;
 
+        public SocketGuildChannel GetChannel(ulong channelID)
+        {
+            if(client.GetChannel(channelID) is SocketGuildChannel x)
+            {
+                return x;
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
+        }
+        public event EventHandler<ulong> AddChannelRequested;
+
         #endregion
 
         #region Commands
@@ -217,6 +211,65 @@ namespace InfinityBot
             var result = await commands.ExecuteAsync(context, argPos, services);
             if (!result.IsSuccess)
                 await context.Channel.SendMessageAsync(result.ErrorReason);
+        }
+
+        public async Task ServerCommand(string cmd, SocketTextChannel channel)
+        {
+            string parameters = string.Empty;
+            try
+            {
+                parameters = cmd.Substring(cmd.IndexOf(' ') + 1);
+            }
+            catch { }
+            if (cmd.StartsWith("!addguild"))
+            {
+                AddGuildCommand(parameters);
+            }
+            else if (cmd.StartsWith("!addchannel"))
+            {
+                AddChannelRequested(this, Convert.ToUInt64(parameters));
+            }
+            else if (cmd.StartsWith("!getchannelid"))
+            {
+                if (channel != null)
+                {
+                    TerminalUpdate(this, TimePrefix + channel.Guild.Name + "/#" + channel.Name + ".ID:" + channel.Id);
+                    Clipboard.SetText(channel.Id.ToString());
+                }
+                else
+                {
+                    TerminalUpdate(this, TimePrefix + "Error: No recent channel.");
+                }
+            }
+            else if (cmd.StartsWith("!getguildid"))
+            {
+                if (channel != null)
+                {
+                    TerminalUpdate(this, TimePrefix + channel.Guild.Name + ".ID:" + channel.Guild.Id);
+                    Clipboard.SetText(channel.Guild.Id.ToString());
+                }
+                else
+                {
+                    TerminalUpdate(this, TimePrefix + "Error: No recent guild.");
+                }
+            }
+            else if (cmd.StartsWith("!game"))
+            {
+                await client.SetGameAsync(parameters);
+            }
+            else
+            {
+                TerminalUpdate(this, TimePrefix + "Not a command!");
+            }
+        }
+
+        private void AddGuildCommand(string parameters)
+        {
+            var guildID = Convert.ToUInt64(parameters);
+            var guildInfo = client.GetGuild(guildID);
+            TerminalUpdate(this, TimePrefix + "Added all text channels from guild " + "\"" + guildInfo.Name + "\".");
+            AddGuildRequested(this, guildID);
+            
         }
 
         #endregion

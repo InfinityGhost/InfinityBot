@@ -39,11 +39,11 @@ namespace InfinityBot
             {
                 LoadDefault();
                 LoadChannels();
-                TerminalUpdate(TimePrefix + "Ready. Default settings loaded.");
+                TerminalUpdate(TimePrefix + "Ready to start bot. Default settings loaded.");
             }
             catch
             {
-                TerminalUpdate(TimePrefix + "Ready.");
+                TerminalUpdate(TimePrefix + "Ready to start bot.");
             }
             
         }
@@ -62,7 +62,12 @@ namespace InfinityBot
                 StartButton.Content = "Stop Bot";
                 bot = new Bot(APIToken.Text);
                 bot.TerminalUpdate += TerminalUpdate;
-                bot.AddGuildRequested += GetChannels;
+
+                {
+                    bot.AddGuildRequested += GetChannels;
+                    bot.AddChannelRequested += AddChannelRequested;
+                }
+
                 if (bot.MainAsync() == Task.CompletedTask)
                 {
                     StartButton.Content = "Start Bot";
@@ -74,6 +79,8 @@ namespace InfinityBot
                 StartButton.Content = "Start Bot";
             }
         }
+
+        
 
         private async void KillBot()
         {
@@ -187,7 +194,7 @@ namespace InfinityBot
 
         async void StatusUpdate(string text)
         {
-            await Dispatcher.BeginInvoke(new Action(() => Status.Text = text));
+            await Dispatcher.BeginInvoke(new Action(() => Status.Text = text.Substring(text.IndexOf(": ") + 2)));
         }
 
         void StatusClear() => Status.Text = string.Empty;
@@ -294,6 +301,7 @@ namespace InfinityBot
                     fileContents[fileContents.Length - 1] = channelItems[i + 1].Content.ToString() + ',' + channelItems[i + 1].Tag.ToString();
                 }
                 File.WriteAllLines(Directory.GetCurrentDirectory() + @"\" + "channels.txt", fileContents);
+                TerminalUpdate(TimePrefix + "Saved all channels.");
             }
             catch(Exception ex)
             {
@@ -355,8 +363,8 @@ namespace InfinityBot
         void UpdateChannelItems()
         {
             Channels.Items.Clear();
-            Array.ForEach(channelItems, item => Channels.Items.Add(item));
-            Array.Sort(channelItems, (x, y) => string.Compare(x.Name.Substring(x.Name.IndexOf('#') + 1), y.Name.Substring(y.Name.IndexOf('#') + 1)));
+            Array.ForEach(channelItems, item => Channels.Items.Add(item)); 
+            //Array.Sort(channelItems, (x, y) => string.Compare(x.Name.Substring(x.Name.IndexOf('#') + 1), y.Name.Substring(y.Name.IndexOf('#') + 1))); // This is supposed to sort this alphabetically lol
             Channels.SelectedIndex = 0;
         }
 
@@ -390,6 +398,7 @@ namespace InfinityBot
         private void GetChannels(object sender, ulong e)
         {
             var x = bot.GetChannels(e);
+            var guild = x[0].Guild;
             Array.ForEach(x, item =>
             {
                 if (item != null)
@@ -397,6 +406,14 @@ namespace InfinityBot
                     AddChannel(item.Guild.Name + "/#" + item.Name, item.Id);
                 }
             });
+        }
+        private void AddChannelRequested(object sender, ulong e)
+        {
+            var channel = bot.GetChannel(e);
+            var guild = channel.Guild;
+            AddChannel(guild.Name + "/#" + channel.Name, channel.Id);
+            TerminalUpdate(TimePrefix +  $"Text channel {guild.Name}/#{channel.Name} added.");
+            Channels.SelectedIndex = channelItems.Length - 1;
         }
 
         #endregion

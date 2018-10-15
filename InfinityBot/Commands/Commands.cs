@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 
 namespace InfinityBot.Commands
 {
@@ -21,14 +22,46 @@ namespace InfinityBot.Commands
         public async Task Announce([Remainder, Summary("The text to announce")] string text)
         {
             await Context.Message.DeleteAsync();
-            string x = "**Announcement** @everyone " + Environment.NewLine + text;
-            await ReplyAsync(x);
+            var channel = Context.Channel;
+            string replyText = text;
+            bool IsVote;
+            try
+            {
+                string owo = text.Substring(text.IndexOf("vote: "));
+                replyText = owo;
+                IsVote = true;
+            }
+            catch
+            {
+                IsVote = false;
+            }
+            string x = "**Announcement** @everyone " + Environment.NewLine + replyText;
+            var reply = await ReplyAsync(x);
+            if (IsVote == true)
+            {
+                Emoji[] reactions =
+                {
+                    new Emoji("👍"),
+                    new Emoji("👎"),
+                };
+                Array.ForEach(reactions, async reaction =>
+                {
+                    await reply.AddReactionAsync(reaction);
+                });
+            }
         }
 
         [Command("ping"), Summary("Pong!")]
         public async Task Ping()
         {
             await ReplyAsync("Pong!");
+        }
+
+        [Command("despacito")]
+        public async Task Despacito()
+        {
+            await Context.Message.DeleteAsync();
+            await ReplyAsync("https://www.youtube.com/watch?v=kJQP7kiw5Fk");
         }
     }
 }
