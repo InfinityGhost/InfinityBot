@@ -9,7 +9,7 @@ using Discord.WebSocket;
 
 namespace InfinityBot.Commands
 {
-    public class Commands : ModuleBase
+    public class UserCommands : ModuleBase
     {
         [Command("say"), Summary("Echos a message")]
         public async Task Say([Remainder, Summary("The text to echo")] string echo)
