@@ -39,16 +39,16 @@ namespace InfinityBot
             {
                 LoadDefault();
                 LoadChannels();
-                TerminalUpdate(TimePrefix + "Ready to start bot. Default settings loaded.");
+                TerminalUpdate("Ready to start bot. Default settings loaded.");
             }
             catch
             {
-                TerminalUpdate(TimePrefix + "Ready to start bot.");
+                TerminalUpdate("Ready to start bot.");
             }
             
         }
 
-        string Version = "0.1.1";
+        string SettingsVersion = "0.1.1";
         string TimePrefix = DateTime.Now + ": ";
 
         private Bot bot;
@@ -97,11 +97,11 @@ namespace InfinityBot
             await Dispatcher.BeginInvoke(new Action(() => x = Terminal.Text));
             if (x == string.Empty)
             {
-                await Dispatcher.BeginInvoke(new Action(() => Terminal.Text += text));
+                await Dispatcher.BeginInvoke(new Action(() => Terminal.Text += TimePrefix + text));
             }
             else
             {
-                await Dispatcher.BeginInvoke(new Action(() => Terminal.Text += Environment.NewLine + text));
+                await Dispatcher.BeginInvoke(new Action(() => Terminal.Text += Environment.NewLine + TimePrefix + text));
             }
             StatusUpdate(text);
 
@@ -118,7 +118,7 @@ namespace InfinityBot
                 }
                 catch (Exception ex)
                 {
-                    StatusUpdate(TimePrefix + "Failed to update log! | " + ex.ToString());
+                    StatusUpdate("Failed to update log! " + ex.ToString());
                 }
             }
         }
@@ -156,7 +156,7 @@ namespace InfinityBot
                         }
                         catch(Exception ex)
                         {
-                            TerminalUpdate(TimePrefix + ex.ToString());
+                            TerminalUpdate(ex.ToString());
                         }
                     }
                     else
@@ -167,18 +167,18 @@ namespace InfinityBot
                         }
                         catch (Discord.Net.HttpException)
                         {
-                            TerminalUpdate(TimePrefix + "Unable to send message due to lack of permissions.");
+                            TerminalUpdate("Unable to send message due to lack of permissions.");
                         }
                         catch(Exception ex)
                         {
-                            TerminalUpdate(TimePrefix + ex.ToString());
+                            TerminalUpdate(ex.ToString());
                         }
                     }
                     (sender as TextBox).Text = string.Empty;
                 }
                 catch(Discord.Net.HttpException)
                 {
-                    TerminalUpdate(TimePrefix + "Error: Failed to send due to lack of permissions.");
+                    TerminalUpdate("Error: Failed to send due to lack of permissions.");
                 }
             }
         }
@@ -207,7 +207,7 @@ namespace InfinityBot
         {
             File.WriteAllLines(path, new string[]
             {
-                "ver:" + Version,
+                "ver:" + SettingsVersion,
                 "apiToken:" + APIToken.Text,
                 "clientID:" + ClientID.Text,
                 "logToFile:" + LogFile.IsChecked,
@@ -216,7 +216,7 @@ namespace InfinityBot
         void Load(string path)
         {
             var x = File.ReadAllLines(path);
-            if (x[0] == "ver:" + Version)
+            if (x[0] == "ver:" + SettingsVersion)
             {
                 APIToken.Text = x[1].Replace("apiToken:", string.Empty);
                 ClientID.Text = x[2].Replace("clientID:", string.Empty);
@@ -259,7 +259,7 @@ namespace InfinityBot
                 }
                 catch
                 {
-                    TerminalUpdate(TimePrefix + "An error has occured while saving a setup file.");
+                    TerminalUpdate("An error has occured while saving a setup file.");
                 }
             }
         }
@@ -279,7 +279,7 @@ namespace InfinityBot
                 }
                 catch
                 {
-                    TerminalUpdate(TimePrefix + "An error has occured while loading a setup file.");
+                    TerminalUpdate("An error has occured while loading a setup file.");
                 }
             }
         }
@@ -301,11 +301,11 @@ namespace InfinityBot
                     fileContents[fileContents.Length - 1] = channelItems[i + 1].Content.ToString() + ',' + channelItems[i + 1].Tag.ToString();
                 }
                 File.WriteAllLines(Directory.GetCurrentDirectory() + @"\" + "channels.txt", fileContents);
-                TerminalUpdate(TimePrefix + "Saved all channels.");
+                TerminalUpdate("Saved all channels.");
             }
             catch(Exception ex)
             {
-                TerminalUpdate(TimePrefix + "Failed to save channels to file." + Environment.NewLine + ex.ToString());
+                TerminalUpdate("Failed to save channels to file." + Environment.NewLine + ex.ToString());
             }
         }
         
@@ -338,7 +338,7 @@ namespace InfinityBot
         void LoadButton(object sender, RoutedEventArgs e) => LoadFile();
         void SaveDefaultsButton(object sender, RoutedEventArgs e)
         {
-            TerminalUpdate(TimePrefix + "Saved defaults.");
+            TerminalUpdate("Saved defaults.");
             SaveDefault();
         }
         void ExitButton(object sender, RoutedEventArgs e) => Close();
@@ -351,7 +351,7 @@ namespace InfinityBot
         {
             string x = "https://discordapp.com/oauth2/authorize?client_id=" + ClientID.Text + @"&scope=bot";
             Clipboard.SetText(x);
-            TerminalUpdate(TimePrefix + "Copied link to clipboard: " + x);
+            TerminalUpdate("Copied link to clipboard: " + x);
         }
 
         #endregion
@@ -412,7 +412,7 @@ namespace InfinityBot
             var channel = bot.GetChannel(e);
             var guild = channel.Guild;
             AddChannel(guild.Name + "/#" + channel.Name, channel.Id);
-            TerminalUpdate(TimePrefix +  $"Text channel {guild.Name}/#{channel.Name} added.");
+            TerminalUpdate( $"Text channel {guild.Name}/#{channel.Name} added.");
             Channels.SelectedIndex = channelItems.Length - 1;
         }
 

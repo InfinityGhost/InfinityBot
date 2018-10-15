@@ -52,7 +52,7 @@ namespace InfinityBot
         public async Task Stop()
         {
             await client.StopAsync();
-            TerminalUpdate(this, TimePrefix + "Client has stopped.");
+            TerminalUpdate(this, "Client has stopped.");
         }
 
         #region Console Outputs
@@ -61,7 +61,7 @@ namespace InfinityBot
 
         private Task Log(LogMessage msg)
         {
-            TerminalUpdate(this, TimePrefix + msg.Message);
+            TerminalUpdate(this, msg.Message);
             return Task.CompletedTask;
         }
 
@@ -69,7 +69,7 @@ namespace InfinityBot
         {
             lastMessage = msg;
             var channel = msg.Channel as SocketGuildChannel;
-            string message = msg.Timestamp.DateTime.ToLocalTime() + ": " + channel.Guild.Name + "/#" + msg.Channel.Name + "/" + msg.Author + ": " + msg.Content;
+            string message = channel.Guild.Name + "/#" + msg.Channel.Name + "/" + msg.Author + ": " + msg.Content;
             TerminalUpdate(this, message);
             return Task.CompletedTask;
         }
@@ -99,7 +99,7 @@ namespace InfinityBot
                 }
                 catch
                 {
-                    TerminalUpdate(this, TimePrefix + "Error: Message failed to send; No channel to reply to.");
+                    TerminalUpdate(this, "Error: Message failed to send; No channel to reply to.");
                     return;
                 }
             }
@@ -120,7 +120,7 @@ namespace InfinityBot
             }
             else
             {
-                TerminalUpdate(this, TimePrefix + "Error: Channel ID is either invalid or channel is not a text channel.");
+                TerminalUpdate(this, "Error: Channel ID is either invalid or channel is not a text channel.");
             }
         }
 
@@ -233,24 +233,24 @@ namespace InfinityBot
             {
                 if (channel != null)
                 {
-                    TerminalUpdate(this, TimePrefix + channel.Guild.Name + "/#" + channel.Name + ".ID:" + channel.Id);
+                    TerminalUpdate(this, channel.Guild.Name + "/#" + channel.Name + ".ID:" + channel.Id);
                     Clipboard.SetText(channel.Id.ToString());
                 }
                 else
                 {
-                    TerminalUpdate(this, TimePrefix + "Error: No recent channel.");
+                    TerminalUpdate(this, "Error: No recent channel.");
                 }
             }
             else if (cmd.StartsWith("!getguildid"))
             {
                 if (channel != null)
                 {
-                    TerminalUpdate(this, TimePrefix + channel.Guild.Name + ".ID:" + channel.Guild.Id);
+                    TerminalUpdate(this, channel.Guild.Name + ".ID:" + channel.Guild.Id);
                     Clipboard.SetText(channel.Guild.Id.ToString());
                 }
                 else
                 {
-                    TerminalUpdate(this, TimePrefix + "Error: No recent guild.");
+                    TerminalUpdate(this, "Error: No recent guild.");
                 }
             }
             else if (cmd.StartsWith("!game"))
@@ -259,7 +259,7 @@ namespace InfinityBot
             }
             else
             {
-                TerminalUpdate(this, TimePrefix + "Not a command!");
+                TerminalUpdate(this, "Not a command!");
             }
         }
 
@@ -267,7 +267,7 @@ namespace InfinityBot
         {
             var guildID = Convert.ToUInt64(parameters);
             var guildInfo = client.GetGuild(guildID);
-            TerminalUpdate(this, TimePrefix + "Added all text channels from guild " + "\"" + guildInfo.Name + "\".");
+            TerminalUpdate(this, "Added all text channels from guild " + "\"" + guildInfo.Name + "\".");
             AddGuildRequested(this, guildID);
             
         }
