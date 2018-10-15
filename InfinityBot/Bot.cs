@@ -34,8 +34,6 @@ namespace InfinityBot
             client.MessageUpdated += MessageUpdated;
             client.Ready += StartupCommands;
 
-            await InstallCommands();
-
             await client.LoginAsync(TokenType.Bot, Token);
             await client.StartAsync();
 
@@ -43,10 +41,9 @@ namespace InfinityBot
             await Task.Delay(-1);
         }
 
-        private Task StartupCommands()
+        private async Task StartupCommands()
         {
-            // Add startup commands
-            return Task.CompletedTask;
+            await InstallCommands();
         }
 
         public async Task Stop()

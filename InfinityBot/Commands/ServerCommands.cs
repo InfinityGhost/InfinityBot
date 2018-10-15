@@ -8,6 +8,5 @@ namespace InfinityBot.Commands
 {
     class ServerCommands
     {
-
     }
 }
