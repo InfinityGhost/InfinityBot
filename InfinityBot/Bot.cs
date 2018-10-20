@@ -19,15 +19,14 @@ namespace InfinityBot
         {
             Token = token;
         }
+        private readonly string Token;
 
         public event EventHandler<string> TerminalUpdate;
 
         DiscordSocketClient client = new DiscordSocketClient();
         CommandService commands = new CommandService();
         readonly IServiceProvider services = new ServiceCollection().BuildServiceProvider();
-        private string Token;
-        readonly string TimePrefix = DateTime.Now + ": ";
-
+        
         #region Main
 
         public async Task MainAsync()
@@ -144,7 +143,6 @@ namespace InfinityBot
 
         #region Event Handlers
 
-
         private async Task MessageReceived(SocketMessage message)
         {
             // TODO: add private message handling to automatically add to list of channels  
@@ -153,10 +151,9 @@ namespace InfinityBot
 
         private Task MessageUpdated(Cacheable<IMessage, ulong> arg1, SocketMessage arg2, ISocketMessageChannel arg3)
         {
-            // Add textbox updating code
+            // TODO: add message update code
             return Task.CompletedTask;
         }
-
 
         #endregion
 
@@ -176,8 +173,6 @@ namespace InfinityBot
                 }
             });
             return channels;
-
-            //throw new NotImplementedException();
         }
         public event EventHandler<ulong> AddGuildRequested;
 
@@ -232,6 +227,7 @@ namespace InfinityBot
 
         public async Task ServerCommand(string cmd, SocketTextChannel channel)
         {
+            //TODO: find a way to clean up server commands
             string parameters;
             try
             {

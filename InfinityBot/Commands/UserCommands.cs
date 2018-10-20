@@ -62,18 +62,19 @@ namespace InfinityBot.Commands
         [Command("despacito")]
         public async Task Despacito()
         {
+            await ReplyAsync("https://www.youtube.com/watch?v=kJQP7kiw5Fk");
+            await Task.Delay(500);
             await Context.Message.DeleteAsync();
-            await ReplyAsync("https://www.youtube.com/watch?v=kJQP7kiw5Fk");            
         }
 
         [Command("help")]
-        public async Task Help([Remainder] string parameters)
+        public async Task Help()
         {
             var assembly = Assembly.GetExecutingAssembly();
             var resourceName = "InfinityBot.Commands.Help.HelpMain.txt";
 
             string HelpText;
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            Stream stream = assembly.GetManifestResourceStream(resourceName);
             using (StreamReader reader = new StreamReader(stream))
             {
                 HelpText = reader.ReadToEnd();
@@ -83,6 +84,11 @@ namespace InfinityBot.Commands
             string codecss = code + "css" + Environment.NewLine;
 
             await ReplyAsync(codecss + HelpText + code);
+        }
+        public async Task Help([Remainder] string parameters)
+        {
+            
+            throw new NotImplementedException();
         }
     }
 }

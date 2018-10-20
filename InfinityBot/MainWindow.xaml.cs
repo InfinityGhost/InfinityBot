@@ -28,12 +28,13 @@ namespace InfinityBot
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Initialization & Variables
+
         public MainWindow()
         {
             InitializeComponent();
         }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        void Window_Loaded(object sender, RoutedEventArgs e)
         {
             ClearChannels();
             try
@@ -49,22 +50,26 @@ namespace InfinityBot
             
         }
 
+        private Bot bot;
+
         string SettingsVersion = "0.1.1";
         string TimePrefix = DateTime.Now + ": ";
 
-        private Bot bot;
+        #endregion
 
         #region Main Bot Controls
 
         void StartBot(object sender, RoutedEventArgs e)
         {
+            // TODO: fix multi-starting bot
             if (StartButton.Content.ToString() == "Start Bot")
             {
                 StartButton.Content = "Stop Bot";
                 bot = new Bot(APIToken.Text);
-                bot.TerminalUpdate += TerminalUpdate;
-
+                
+                // Event handlers
                 {
+                    bot.TerminalUpdate += TerminalUpdate;
                     bot.AddGuildRequested += GetChannels;
                     bot.AddChannelRequested += AddChannelRequested;
                 }
@@ -81,8 +86,6 @@ namespace InfinityBot
             }
         }
 
-        
-
         private async void KillBot()
         {
             await bot.Stop();
@@ -90,55 +93,9 @@ namespace InfinityBot
 
         #endregion
 
-        #region Terminal
+        #region Terminal & StatusBar
 
-        async void TerminalUpdate(string text)
-        {
-            string x = null;
-            await Dispatcher.BeginInvoke(new Action(() => x = Terminal.Text));
-            if (x == string.Empty)
-            {
-                await Dispatcher.BeginInvoke(new Action(() => Terminal.Text += TimePrefix + text));
-            }
-            else
-            {
-                await Dispatcher.BeginInvoke(new Action(() => Terminal.Text += Environment.NewLine + TimePrefix + text));
-            }
-            StatusUpdate(text);
-
-            string LoggingText = null;
-            await Dispatcher.BeginInvoke(new Action(() => LoggingText = Terminal.Text));
-
-            bool logFile = false;
-            await Dispatcher.BeginInvoke(new Action(() => logFile = LogFile.IsChecked));
-            if (logFile == true)
-            {
-                try
-                {
-                    File.WriteAllText(Directory.GetCurrentDirectory() + @"\" + "log.log", LoggingText);
-                }
-                catch (Exception ex)
-                {
-                    StatusUpdate("Failed to update log! " + ex.ToString());
-                }
-            }
-        }
-        void TerminalUpdate(string[] text) => Array.ForEach(text, line => TerminalUpdate(line));
-        async void TerminalUpdate(object sender, string e) => await BotUpdate(e);
-
-        public async Task DispatcherInvoke(object uiObject, object newValue)
-        {
-            await Dispatcher.BeginInvoke(new Action(() => uiObject = newValue));
-        }
-
-        Task BotUpdate(string text)
-        {
-            TerminalUpdate(text);
-            return Task.CompletedTask;
-        }
-
-        void TerminalClear() => Terminal.Text = string.Empty;
-
+        // Terminal
         async void TerminalCommand(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -184,21 +141,58 @@ namespace InfinityBot
             }
         }
 
-        // Context Menu
+        async void TerminalUpdate(string text)
+        {
+            //TODO: cleanup dispatcher work
+            string x = null;
+            await Dispatcher.BeginInvoke(new Action(() => x = Terminal.Text));
+            if (x == string.Empty)
+            {
+                await Dispatcher.BeginInvoke(new Action(() => Terminal.Text += TimePrefix + text));
+            }
+            else
+            {
+                await Dispatcher.BeginInvoke(new Action(() => Terminal.Text += Environment.NewLine + TimePrefix + text));
+            }
+            StatusUpdate(text);
 
+            string LoggingText = null;
+            await Dispatcher.BeginInvoke(new Action(() => LoggingText = Terminal.Text));
+
+            bool logFile = false;
+            await Dispatcher.BeginInvoke(new Action(() => logFile = LogFile.IsChecked));
+            if (logFile == true)
+            {
+                try
+                {
+                    File.WriteAllText(Directory.GetCurrentDirectory() + @"\" + "log.log", LoggingText);
+                }
+                catch (Exception ex)
+                {
+                    StatusUpdate("Failed to update log! " + ex.ToString());
+                }
+            }
+        }
+
+        void TerminalUpdate(string[] text) => Array.ForEach(text, line => TerminalUpdate(line));
+        void TerminalUpdate(object sender, string e) => TerminalUpdate(e);
+        void TerminalClear() => Terminal.Text = string.Empty;
+
+        // Context Menu
         void TerminalClear(object sender, RoutedEventArgs e) => TerminalClear();
         void TerminalCopy(object sender, RoutedEventArgs e) => Clipboard.SetText(Terminal.Text);
 
-        #endregion
-
-        #region Status
-
+        // Status
         async void StatusUpdate(string text)
         {
-            await Dispatcher.BeginInvoke(new Action(() => Status.Text = text.Substring(text.IndexOf(": ", 0) + 1)));
+            // TODO: fix incorrect ": " being used, should be the time
+            await Dispatcher.BeginInvoke(new Action(() =>
+            {
+                Status.Text = text.Substring(text.IndexOf(": ") + 1);
+            }));
         }
-
         void StatusClear() => Status.Text = string.Empty;
+
 
         #endregion
 
@@ -328,36 +322,7 @@ namespace InfinityBot
 
         #endregion
 
-        #region Menu Buttons
-
-        private void AboutShow(object sender, RoutedEventArgs e)
-        {
-            var x = new AboutBox();
-            x.ShowDialog();
-        }
-        void SaveButton(object sender, RoutedEventArgs e) => SaveFile();
-        void LoadButton(object sender, RoutedEventArgs e) => LoadFile();
-        void SaveDefaultsButton(object sender, RoutedEventArgs e)
-        {
-            TerminalUpdate("Saved defaults.");
-            SaveDefault();
-        }
-        void ExitButton(object sender, RoutedEventArgs e) => Close();
-
-        #endregion
-
-        #region Settings Page Buttons
-
-        private void GetInvite(object sender, RoutedEventArgs e)
-        {
-            string x = "https://discordapp.com/oauth2/authorize?client_id=" + ClientID.Text + @"&scope=bot";
-            Clipboard.SetText(x);
-            TerminalUpdate("Copied link to clipboard: " + x);
-        }
-
-        #endregion
-
-        #region Channels Combobox
+        #region Channel Management
 
         ComboBoxItem[] channelItems = { };
 
@@ -413,10 +378,40 @@ namespace InfinityBot
             var channel = bot.GetChannel(e);
             var guild = channel.Guild;
             AddChannel(guild.Name + "/#" + channel.Name, channel.Id);
-            TerminalUpdate( $"Text channel {guild.Name}/#{channel.Name} added.");
+            TerminalUpdate($"Text channel {guild.Name}/#{channel.Name} added.");
             Channels.SelectedIndex = channelItems.Length - 1;
         }
 
         #endregion
+
+        #region Menu Buttons
+
+        private void AboutShow(object sender, RoutedEventArgs e)
+        {
+            var x = new AboutBox();
+            x.ShowDialog();
+        }
+        void SaveButton(object sender, RoutedEventArgs e) => SaveFile();
+        void LoadButton(object sender, RoutedEventArgs e) => LoadFile();
+        void SaveDefaultsButton(object sender, RoutedEventArgs e)
+        {
+            TerminalUpdate("Saved defaults.");
+            SaveDefault();
+        }
+        void ExitButton(object sender, RoutedEventArgs e) => Close();
+
+        #endregion
+
+        #region Misc.
+
+        private void GetInvite(object sender, RoutedEventArgs e)
+        {
+            string x = "https://discordapp.com/oauth2/authorize?client_id=" + ClientID.Text + @"&scope=bot";
+            Clipboard.SetText(x);
+            TerminalUpdate("Copied link to clipboard: " + x);
+        }
+
+        #endregion
+
     }
 }
