@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System.Reflection;
 
 namespace InfinityBot.Commands
 {
@@ -61,7 +63,26 @@ namespace InfinityBot.Commands
         public async Task Despacito()
         {
             await Context.Message.DeleteAsync();
-            await ReplyAsync("https://www.youtube.com/watch?v=kJQP7kiw5Fk");
+            await ReplyAsync("https://www.youtube.com/watch?v=kJQP7kiw5Fk");            
+        }
+
+        [Command("help")]
+        public async Task Help([Remainder] string parameters)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "InfinityBot.Commands.Help.HelpMain.txt";
+
+            string HelpText;
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                HelpText = reader.ReadToEnd();
+            }
+            
+            string code = "```";
+            string codecss = code + "css" + Environment.NewLine;
+
+            await ReplyAsync(codecss + HelpText + code);
         }
     }
 }

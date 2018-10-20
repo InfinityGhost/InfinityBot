@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace InfinityBot
 {
@@ -26,6 +27,8 @@ namespace InfinityBot
         readonly IServiceProvider services = new ServiceCollection().BuildServiceProvider();
         private string Token;
         readonly string TimePrefix = DateTime.Now + ": ";
+
+        #region Main
 
         public async Task MainAsync()
         {
@@ -52,6 +55,8 @@ namespace InfinityBot
             TerminalUpdate(this, "Client has stopped.");
         }
 
+        #endregion
+
         #region Console Outputs
 
         SocketMessage lastMessage;
@@ -66,7 +71,21 @@ namespace InfinityBot
         {
             lastMessage = msg;
             var channel = msg.Channel as SocketGuildChannel;
-            string message = channel.Guild.Name + "/#" + msg.Channel.Name + "/" + msg.Author + ": " + msg.Content;
+            string message = channel.Guild.Name + "/#" + channel.Name + "/" + msg.Author + ": " + msg.Content;
+            
+            if (msg.Attachments.ToArray() is Attachment[] attachments)
+            {
+                for (int i = 0; i < attachments.Length; i++)
+                {
+                    message += "{" + attachments[i].Filename + "}";
+
+                    if (i < attachments.Length - 1)
+                    {
+                        message += ", ";
+                    }
+                }
+            }
+            
             TerminalUpdate(this, message);
             return Task.CompletedTask;
         }
@@ -128,6 +147,7 @@ namespace InfinityBot
 
         private async Task MessageReceived(SocketMessage message)
         {
+            // TODO: add private message handling to automatically add to list of channels  
             await Log(message);
         }
 
@@ -212,12 +232,15 @@ namespace InfinityBot
 
         public async Task ServerCommand(string cmd, SocketTextChannel channel)
         {
-            string parameters = string.Empty;
+            string parameters;
             try
             {
                 parameters = cmd.Substring(cmd.IndexOf(' ') + 1);
             }
-            catch { }
+            catch
+            {
+                parameters = string.Empty;
+            }
             if (cmd.StartsWith("!addguild"))
             {
                 AddGuildCommand(parameters);
@@ -254,9 +277,81 @@ namespace InfinityBot
             {
                 await client.SetGameAsync(parameters);
             }
+            else if (cmd.StartsWith("!del"))
+            {
+                if (channel == null)
+                {
+                    TerminalUpdate(this, "No recent channel.");
+                    return;
+                }
+                if (parameters == "!del")
+                {
+                    parameters = string.Empty;
+                }
+                if (parameters == null || parameters == string.Empty)
+                {
+                    var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(1).Flatten();
+                    var msgArray = msgCollection.ToArray();
+
+                    try
+                    {
+                        await msgArray[0].DeleteAsync();
+                        TerminalUpdate(this, $"Deleted last message from {channel.Guild.Name}/#{channel.Name}.");
+                    }
+                    catch(IndexOutOfRangeException)
+                    {
+                        TerminalUpdate(this, "No messages to delete.");
+                    }
+                }
+                else
+                {
+                    int messageCount = Convert.ToInt32(parameters.Split(' ')[0]);
+                    
+
+                    if (messageCount > 100)
+                    {
+                        messageCount = 100;
+                    }
+
+                    var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(messageCount).Flatten();
+
+                    try
+                    {
+                        string update = string.Empty;
+                        string text = string.Empty;
+                        try
+                        {
+                            text = parameters.Substring(messageCount.ToString().Length + 1);
+                        }
+                        catch { }
+                        if (text != string.Empty)
+                        {
+                            msgCollection = msgCollection.Where(msg => msg.Content.Contains(text));
+                            await (channel as ISocketMessageChannel).DeleteMessagesAsync(msgCollection);
+                            update = $"Deleted {msgCollection.ToArray().Length} containing \"{text}\" messages from {channel.Guild.Name}/#{channel.Name}.";
+                        }
+                        else
+                        {
+                            await (channel as ISocketMessageChannel).DeleteMessagesAsync(msgCollection);
+                            update = $"Deleted {msgCollection.ToArray().Length} messages from {channel.Guild.Name}/#{channel.Name}.";
+                        }
+                        TerminalUpdate(this, update);
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        TerminalUpdate(this, "No messages to delete.");
+                    }
+
+
+                }
+            }
+            else if (cmd.StartsWith("!edit"))
+            {
+                // add edit command
+            }
             else
             {
-                TerminalUpdate(this, "Not a command!");
+                TerminalUpdate(this, "Not a command.");
             }
         }
 

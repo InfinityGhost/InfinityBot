@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
 using System.Threading;
+using System.Reflection;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Clipboard = System.Windows.Clipboard;
 using TextBox = System.Windows.Controls.TextBox;
@@ -108,9 +109,9 @@ namespace InfinityBot
             string LoggingText = null;
             await Dispatcher.BeginInvoke(new Action(() => LoggingText = Terminal.Text));
 
-            bool log = false;
-            await Dispatcher.BeginInvoke(new Action(() => log = LogFile.IsChecked));
-            if (log == true)
+            bool logFile = false;
+            await Dispatcher.BeginInvoke(new Action(() => logFile = LogFile.IsChecked));
+            if (logFile == true)
             {
                 try
                 {
@@ -123,10 +124,7 @@ namespace InfinityBot
             }
         }
         void TerminalUpdate(string[] text) => Array.ForEach(text, line => TerminalUpdate(line));
-        async void TerminalUpdate(object sender, string e)
-        {
-            await BotUpdate(e);
-        }
+        async void TerminalUpdate(object sender, string e) => await BotUpdate(e);
 
         public async Task DispatcherInvoke(object uiObject, object newValue)
         {
@@ -145,40 +143,43 @@ namespace InfinityBot
         {
             if (e.Key == Key.Enter)
             {
-                try
+                if ((sender as TextBox).Text != string.Empty)
                 {
-                    var selectedItem = Channels.SelectedItem as ComboBoxItem;
-                    if (selectedItem.Tag.ToString() == "-1")
+                    try
                     {
-                        try
+                        var selectedItem = Channels.SelectedItem as ComboBoxItem;
+                        if (selectedItem.Tag.ToString() == "-1")
                         {
-                            await bot.ReplyToMessage((sender as TextBox).Text);
+                            try
+                            {
+                                await bot.ReplyToMessage((sender as TextBox).Text);
+                            }
+                            catch (Exception ex)
+                            {
+                                TerminalUpdate(ex.ToString());
+                            }
                         }
-                        catch(Exception ex)
+                        else
                         {
-                            TerminalUpdate(ex.ToString());
+                            try
+                            {
+                                await bot.MessageDirect((sender as TextBox).Text, Convert.ToUInt64(selectedItem.Tag));
+                            }
+                            catch (Discord.Net.HttpException)
+                            {
+                                TerminalUpdate("Unable to send message due to lack of permissions.");
+                            }
+                            catch (Exception ex)
+                            {
+                                TerminalUpdate(ex.ToString());
+                            }
                         }
+                        (sender as TextBox).Text = string.Empty;
                     }
-                    else
+                    catch (Discord.Net.HttpException)
                     {
-                        try
-                        {
-                            await bot.MessageDirect((sender as TextBox).Text, Convert.ToUInt64(selectedItem.Tag));
-                        }
-                        catch (Discord.Net.HttpException)
-                        {
-                            TerminalUpdate("Unable to send message due to lack of permissions.");
-                        }
-                        catch(Exception ex)
-                        {
-                            TerminalUpdate(ex.ToString());
-                        }
+                        TerminalUpdate("Error: Failed to send due to lack of permissions.");
                     }
-                    (sender as TextBox).Text = string.Empty;
-                }
-                catch(Discord.Net.HttpException)
-                {
-                    TerminalUpdate("Error: Failed to send due to lack of permissions.");
                 }
             }
         }
@@ -194,7 +195,7 @@ namespace InfinityBot
 
         async void StatusUpdate(string text)
         {
-            await Dispatcher.BeginInvoke(new Action(() => Status.Text = text.Substring(text.IndexOf(": ") + 2)));
+            await Dispatcher.BeginInvoke(new Action(() => Status.Text = text.Substring(text.IndexOf(": ", 0) + 1)));
         }
 
         void StatusClear() => Status.Text = string.Empty;
