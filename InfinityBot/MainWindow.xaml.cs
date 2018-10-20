@@ -183,14 +183,12 @@ namespace InfinityBot
         // Status
         async void StatusUpdate(string text)
         {
-            // TODO: fix incorrect ": " being used, should be the time
             await Dispatcher.BeginInvoke(new Action(() =>
             {
-                Status.Text = text.Substring(text.IndexOf(": ") + 1);
+                Status.Text = text.Replace(TimePrefix, string.Empty);
             }));
         }
         void StatusClear() => Status.Text = string.Empty;
-
 
         #endregion
 
