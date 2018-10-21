@@ -51,6 +51,7 @@ namespace InfinityBot
         public async Task Stop()
         {
             await client.StopAsync();
+            client = null;
             TerminalUpdate(this, "Client has stopped.");
         }
 
@@ -227,127 +228,135 @@ namespace InfinityBot
 
         public async Task ServerCommand(string cmd, SocketTextChannel channel)
         {
-            //TODO: find a way to clean up server commands
-            string parameters;
+            string[] command = cmd.Split(' ');
+            string parameters = string.Empty;
             try
             {
-                parameters = cmd.Substring(cmd.IndexOf(' ') + 1);
+                parameters = cmd.Substring(command[0].Length + 1);
             }
-            catch
-            {
-                parameters = string.Empty;
-            }
-            if (cmd.StartsWith("!addguild"))
-            {
-                AddGuildCommand(parameters);
-            }
-            else if (cmd.StartsWith("!addchannel"))
-            {
-                AddChannelRequested(this, Convert.ToUInt64(parameters));
-            }
-            else if (cmd.StartsWith("!getchannelid"))
-            {
-                if (channel != null)
-                {
-                    TerminalUpdate(this, channel.Guild.Name + "/#" + channel.Name + ".ID:" + channel.Id);
-                    Clipboard.SetText(channel.Id.ToString());
-                }
-                else
-                {
-                    TerminalUpdate(this, "Error: No recent channel.");
-                }
-            }
-            else if (cmd.StartsWith("!getguildid"))
-            {
-                if (channel != null)
-                {
-                    TerminalUpdate(this, channel.Guild.Name + ".ID:" + channel.Guild.Id);
-                    Clipboard.SetText(channel.Guild.Id.ToString());
-                }
-                else
-                {
-                    TerminalUpdate(this, "Error: No recent guild.");
-                }
-            }
-            else if (cmd.StartsWith("!game"))
-            {
-                await client.SetGameAsync(parameters);
-            }
-            else if (cmd.StartsWith("!del"))
-            {
-                if (channel == null)
-                {
-                    TerminalUpdate(this, "No recent channel.");
-                    return;
-                }
-                if (parameters == "!del")
-                {
-                    parameters = string.Empty;
-                }
-                if (parameters == null || parameters == string.Empty)
-                {
-                    var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(1).Flatten();
-                    var msgArray = msgCollection.ToArray();
+            catch { }
 
-                    try
+            switch (command[0])
+            {
+                case "!addguild":
                     {
-                        await msgArray[0].DeleteAsync();
-                        TerminalUpdate(this, $"Deleted last message from {channel.Guild.Name}/#{channel.Name}.");
+                        AddGuildCommand(parameters);
+                        break;
                     }
-                    catch(IndexOutOfRangeException)
+                case "!addchannel":
                     {
-                        TerminalUpdate(this, "No messages to delete.");
+                        AddChannelRequested(this, Convert.ToUInt64(parameters));
+                        break;
                     }
-                }
-                else
-                {
-                    int messageCount = Convert.ToInt32(parameters.Split(' ')[0]);
-                    
-
-                    if (messageCount > 100)
+                case "!getchannelid":
                     {
-                        messageCount = 100;
-                    }
-
-                    var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(messageCount).Flatten();
-
-                    try
-                    {
-                        string update = string.Empty;
-                        string text = string.Empty;
-                        try
+                        if (channel != null)
                         {
-                            text = parameters.Substring(messageCount.ToString().Length + 1);
-                        }
-                        catch { }
-                        if (text != string.Empty)
-                        {
-                            msgCollection = msgCollection.Where(msg => msg.Content.Contains(text));
-                            await (channel as ISocketMessageChannel).DeleteMessagesAsync(msgCollection);
-                            update = $"Deleted {msgCollection.ToArray().Length} containing \"{text}\" messages from {channel.Guild.Name}/#{channel.Name}.";
+                            TerminalUpdate(this, channel.Guild.Name + "/#" + channel.Name + ".ID:" + channel.Id);
+                            Clipboard.SetText(channel.Id.ToString());
                         }
                         else
                         {
-                            await (channel as ISocketMessageChannel).DeleteMessagesAsync(msgCollection);
-                            update = $"Deleted {msgCollection.ToArray().Length} messages from {channel.Guild.Name}/#{channel.Name}.";
+                            TerminalUpdate(this, "Error: No recent channel.");
                         }
-                        TerminalUpdate(this, update);
+                        break;
                     }
-                    catch (IndexOutOfRangeException)
+                case "!getguildid":
                     {
-                        TerminalUpdate(this, "No messages to delete.");
+                        if (channel != null)
+                        {
+                            TerminalUpdate(this, channel.Guild.Name + ".ID:" + channel.Guild.Id);
+                            Clipboard.SetText(channel.Guild.Id.ToString());
+                        }
+                        else
+                        {
+                            TerminalUpdate(this, "Error: No recent guild.");
+                        }
+                        break;
                     }
+                case "!game":
+                    {
+                        await client.SetGameAsync(parameters);
+                        break;
+                    }
+                case "!del":
+                    {
+                        if (channel == null)
+                        {
+                            TerminalUpdate(this, "No recent channel.");
+                            return;
+                        }
+                        if (parameters == "!del")
+                        {
+                            parameters = string.Empty;
+                        }
+                        if (parameters == null || parameters == string.Empty)
+                        {
+                            var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(1).Flatten();
+                            var msgArray = msgCollection.ToArray();
+
+                            try
+                            {
+                                await msgArray[0].DeleteAsync();
+                                TerminalUpdate(this, $"Deleted last message from {channel.Guild.Name}/#{channel.Name}.");
+                            }
+                            catch (IndexOutOfRangeException)
+                            {
+                                TerminalUpdate(this, "No messages to delete.");
+                            }
+                        }
+                        else
+                        {
+                            int messageCount = Convert.ToInt32(parameters.Split(' ')[0]);
 
 
-                }
-            }
-            else if (cmd.StartsWith("!edit"))
-            {
-                // add edit command
-            }
-            else
-            {
-                TerminalUpdate(this, "Not a command.");
+                            if (messageCount > 100)
+                            {
+                                messageCount = 100;
+                            }
+
+                            var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(messageCount).Flatten();
+
+                            try
+                            {
+                                string update = string.Empty;
+                                string text = string.Empty;
+                                try
+                                {
+                                    text = parameters.Substring(messageCount.ToString().Length + 1);
+                                }
+                                catch { }
+                                if (text != string.Empty)
+                                {
+                                    msgCollection = msgCollection.Where(msg => msg.Content.Contains(text));
+                                    await (channel as ISocketMessageChannel).DeleteMessagesAsync(msgCollection);
+                                    update = $"Deleted {msgCollection.ToArray().Length} messages containing \"{text}\" from {channel.Guild.Name}/#{channel.Name}.";
+                                }
+                                else
+                                {
+                                    await (channel as ISocketMessageChannel).DeleteMessagesAsync(msgCollection);
+                                    update = $"Deleted {msgCollection.ToArray().Length} messages from {channel.Guild.Name}/#{channel.Name}.";
+                                }
+                                TerminalUpdate(this, update);
+                            }
+                            catch (IndexOutOfRangeException)
+                            {
+                                TerminalUpdate(this, "No messages to delete.");
+                            }
+                        }
+                        break;
+                    }
+                case "!edit":
+                    {
+                        // TODO: add edit command
+                        throw new NotImplementedException();
+                        break;
+                    }
+                default:
+                    {
+                        TerminalUpdate(this, "Not a command.");
+                        break;
+                    }
             }
         }
 

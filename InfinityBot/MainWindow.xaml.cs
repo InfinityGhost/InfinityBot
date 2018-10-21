@@ -124,7 +124,11 @@ namespace InfinityBot
                             }
                             catch (Discord.Net.HttpException)
                             {
-                                TerminalUpdate("Unable to send message due to lack of permissions.");
+                                TerminalUpdate("Error: Unable to send message due to lack of permissions.");
+                            }
+                            catch (NullReferenceException)
+                            {
+                                TerminalUpdate("Error: Bot must be running in order to send messages or commands.");
                             }
                             catch (Exception ex)
                             {
@@ -166,7 +170,7 @@ namespace InfinityBot
                     }
                     catch (Exception ex)
                     {
-                        StatusUpdate("Failed to update log! " + ex.ToString());
+                        StatusUpdate("Error: Failed to update log! " + ex.ToString());
                     }
                 }
             }));
@@ -250,7 +254,7 @@ namespace InfinityBot
                 }
                 catch
                 {
-                    TerminalUpdate("An error has occured while saving a setup file.");
+                    TerminalUpdate("Error: An error has occured while saving a setup file.");
                 }
             }
         }
@@ -270,7 +274,7 @@ namespace InfinityBot
                 }
                 catch
                 {
-                    TerminalUpdate("An error has occured while loading a setup file.");
+                    TerminalUpdate("Error: An error has occured while loading a setup file.");
                 }
             }
         }
