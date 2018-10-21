@@ -47,7 +47,10 @@ namespace InfinityBot
             {
                 TerminalUpdate("Ready to start bot.");
             }
-            
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                Title += " - Debugging";
+            }
         }
 
         private Bot bot;
