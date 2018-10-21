@@ -87,7 +87,7 @@ namespace InfinityBot.Commands
         }
         public async Task Help([Remainder] string parameters)
         {
-            
+            //TODO: add help command
             throw new NotImplementedException();
         }
     }

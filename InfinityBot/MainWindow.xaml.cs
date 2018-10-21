@@ -61,7 +61,6 @@ namespace InfinityBot
 
         void StartBot(object sender, RoutedEventArgs e)
         {
-            // TODO: fix multi-starting bot
             if (StartButton.Content.ToString() == "Start Bot")
             {
                 StartButton.Content = "Stop Bot";
