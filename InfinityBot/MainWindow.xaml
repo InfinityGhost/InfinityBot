@@ -45,7 +45,7 @@
                         </Grid>
                     </GroupBox>
                     <ComboBox x:Name="Channels" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,11" Width="200"/>
-                    <Button x:Name="StartButton" HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="Start Bot" Height="24" Width="100" Margin="0,0,0,10" Click="StartBot"/>
+                    <Button x:Name="StartButton" HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="Start Bot" Height="24" Width="100" Margin="0,0,0,10" Click="StartBot" IsTabStop="False"/>
                 </Grid>
             </TabItem>
 

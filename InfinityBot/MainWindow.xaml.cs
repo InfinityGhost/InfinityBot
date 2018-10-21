@@ -87,11 +87,7 @@ namespace InfinityBot
                 StartButton.Content = "Start Bot";
             }
         }
-
-        private async void KillBot()
-        {
-            await bot.Stop();
-        }
+        private async void KillBot() => await bot.Stop();
 
         #endregion
 
