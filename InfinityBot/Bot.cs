@@ -71,7 +71,16 @@ namespace InfinityBot
         {
             lastMessage = msg;
             var channel = msg.Channel as SocketGuildChannel;
-            string message = channel.Guild.Name + "/#" + channel.Name + "/" + msg.Author + ": " + msg.Content;
+            string message = channel.Guild.Name + "/#" + channel.Name + "/" + msg.Author + ": ";
+
+            if (msg.Content.Contains("\n"))
+            {
+                message += Environment.NewLine + msg.Content;
+            }
+            else
+            {
+                message += msg.Content;
+            }
             
             if (msg.Attachments.ToArray() is Attachment[] attachments)
             {
