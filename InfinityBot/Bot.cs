@@ -24,7 +24,7 @@ namespace InfinityBot
         public event EventHandler<string> TerminalUpdate;
 
         DiscordSocketClient client = new DiscordSocketClient();
-        CommandService commands = new CommandService();
+        CommandService userCommands = new CommandService();
         readonly IServiceProvider services = new ServiceCollection().BuildServiceProvider();
         
         #region Main
@@ -233,7 +233,7 @@ namespace InfinityBot
             // Hook the MessageReceived Event into our Command Handler
             client.MessageReceived += HandleCommand;
             // Discover all of the commands in this assembly and load them.
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            await userCommands.AddModulesAsync(Assembly.GetEntryAssembly());
         }
 
         private async Task HandleCommand(SocketMessage messageParam)
@@ -255,7 +255,7 @@ namespace InfinityBot
             var context = new CommandContext(client, message);
             // Execute the command. (result does not indicate a return value, 
             // rather an object stating if the command executed successfully)
-            var result = await commands.ExecuteAsync(context, argPos, services);
+            var result = await userCommands.ExecuteAsync(context, argPos, services);
             if (!result.IsSuccess)
                 await context.Channel.SendMessageAsync(result.ErrorReason);
         }
