@@ -85,6 +85,8 @@ namespace InfinityBot.Commands
 
             await ReplyAsync(codecss + HelpText + code);
         }
+
+        [Command("help")]
         public async Task Help([Remainder] string parameters)
         {
             //TODO: add help command

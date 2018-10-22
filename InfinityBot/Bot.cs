@@ -70,11 +70,29 @@ namespace InfinityBot
 
         private Task Log(SocketMessage msg)
         {
-            // TODO: show private messages when logging
-            // Currently throws System.NullReferenceException
             lastMessage = msg;
-            var channel = msg.Channel as SocketGuildChannel;
-            string message = channel.Guild.Name + "/#" + channel.Name + "/" + msg.Author + ": ";
+            string message = string.Empty;
+            if(msg.Channel is SocketGuildChannel channel)
+            {
+                message = channel.Guild.Name + "/#" + channel.Name + "/" + msg.Author + ": ";
+            }
+            else if (msg.Channel is SocketDMChannel dm)
+            {
+                var users = dm.Users.ToArray();
+                string userstring = "DM " + "{";
+                for(int i = 0; i < users.Length; i++)
+                {
+                    if(i < users.Length - 1)
+                    {
+                        userstring += users[i].Username + ", ";
+                    }
+                    else
+                    {
+                        userstring += users[i].Username;
+                    }
+                }
+                message = userstring + "}" + ": ";
+            }
 
             if (msg.Content.Contains("\n"))
             {
