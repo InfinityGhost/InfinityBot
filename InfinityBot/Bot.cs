@@ -46,6 +46,7 @@ namespace InfinityBot
         private async Task StartupCommands()
         {
             await InstallCommands();
+            TerminalUpdate(this, "Username: " + client.CurrentUser.Username);
         }
 
         public async Task Stop()
@@ -69,6 +70,8 @@ namespace InfinityBot
 
         private Task Log(SocketMessage msg)
         {
+            // TODO: show private messages when logging
+            // Currently throws System.NullReferenceException
             lastMessage = msg;
             var channel = msg.Channel as SocketGuildChannel;
             string message = channel.Guild.Name + "/#" + channel.Name + "/" + msg.Author + ": ";
@@ -161,7 +164,11 @@ namespace InfinityBot
 
         private Task MessageUpdated(Cacheable<IMessage, ulong> arg1, SocketMessage arg2, ISocketMessageChannel arg3)
         {
-            // TODO: add message update code
+            var msg = arg2;
+            var channel = msg.Channel as SocketGuildChannel;
+            string message = "Message Updated | " + channel.Guild.Name + "/#" + channel.Name + "/" + msg.Author + ": ";
+            message += msg.Content;
+            TerminalUpdate(this, message);
             return Task.CompletedTask;
         }
 

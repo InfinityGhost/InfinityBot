@@ -1,5 +1,5 @@
 ﻿# InfinityBot
-	by InfinityGhost
+	by @InfinityGhost#7843
 
 !help <topic>   | Gets you help!
 !say <string>   | Makes the bot say something.
