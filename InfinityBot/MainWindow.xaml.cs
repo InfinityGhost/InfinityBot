@@ -76,7 +76,7 @@ namespace InfinityBot
                     bot.AddChannelRequested += AddChannelRequested;
                 }
 
-                if (bot.MainAsync() == Task.CompletedTask)
+                if (bot.Start() == Task.CompletedTask)
                 {
                     StartButton.Content = "Start Bot";
                 }

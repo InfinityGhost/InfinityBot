@@ -29,7 +29,7 @@ namespace InfinityBot
         
         #region Main
 
-        public async Task MainAsync()
+        public async Task Start()
         {
             client.Log += Log;
             client.MessageReceived += MessageReceived;
