@@ -53,7 +53,7 @@ namespace InfinityBot
         {
             await client.StopAsync();
             client = null;
-            TerminalUpdate(this, "Client has stopped.");
+            TerminalUpdate(this, "Bot has stopped.");
         }
 
         #endregion
