@@ -57,6 +57,7 @@ namespace InfinityBot
 
         string SettingsVersion = "0.1.1";
         string TimePrefix = DateTime.Now + ": ";
+        string logfile = Directory.GetCurrentDirectory() + @"\" + "log.log";
 
         #endregion
 
@@ -158,13 +159,13 @@ namespace InfinityBot
                 }
                 StatusUpdate(text);
 
-                string LoggingText = Terminal.Text;
-
                 if (LogFile.IsChecked == true)
                 {
                     try
                     {
-                        File.WriteAllText(Directory.GetCurrentDirectory() + @"\" + "log.log", LoggingText);
+                        string log = File.ReadAllText(logfile);
+                        log += Environment.NewLine + TimePrefix + text;
+                        File.WriteAllText(logfile, log);
                     }
                     catch (Exception ex)
                     {
