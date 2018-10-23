@@ -68,18 +68,18 @@
                 </Grid>
             </TabItem>
 
-            <!--<TabItem Header="Guildss">
+            <TabItem Header="Channels">
                 <Grid>
-                    <GroupBox Header="Guilds">
+                    <GroupBox Header="Channels">
                         <DataGrid Background="{x:Null}" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Channel Name"/>
-                                <DataGridTextColumn Header="Channel ID"/>
+                                <DataGridTextColumn Header="Channel Name" Width="200"/>
+                                <DataGridTextColumn Header="Channel ID" Width="200"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </GroupBox>
                 </Grid>
-            </TabItem>-->
+            </TabItem>
 
         </TabControl>
 
