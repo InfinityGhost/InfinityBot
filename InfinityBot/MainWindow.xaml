@@ -71,10 +71,10 @@
             <TabItem Header="Channels">
                 <Grid>
                     <GroupBox Header="Channels">
-                        <DataGrid Background="{x:Null}" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+                        <DataGrid x:Name="ChannelDataGrid" Background="{x:Null}" Margin="5" AutoGenerateColumns="False" CanUserResizeRows="False" RowHeaderWidth="0">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Channel Name" Width="200"/>
-                                <DataGridTextColumn Header="Channel ID" Width="200"/>
+                                <DataGridTextColumn Header="Channel Name" Binding="{Binding Content}" Width="200" CanUserResize="False"/>
+                                <DataGridTextColumn x:Name="IDColumn" Header="Channel ID" Binding="{Binding Tag}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </GroupBox>

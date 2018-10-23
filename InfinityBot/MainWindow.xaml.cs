@@ -20,6 +20,7 @@ using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Clipboard = System.Windows.Clipboard;
 using TextBox = System.Windows.Controls.TextBox;
 using Discord.WebSocket;
+using System.Collections.ObjectModel;
 
 namespace InfinityBot
 {
@@ -312,8 +313,11 @@ namespace InfinityBot
             {
                 Array.ForEach(fileContents, item =>
                 {
-                    var x = item.Split(',');
-                    AddChannel(x[0], x[1]);
+                    if (item != string.Empty)
+                    {
+                        var x = item.Split(',');
+                        AddChannel(x[0], x[1]);
+                    }
                 });
             }
             catch { }
@@ -329,9 +333,18 @@ namespace InfinityBot
         {
             Channels.Items.Clear();
             Array.ForEach(channelItems, item => Channels.Items.Add(item)); 
-            //Array.Sort(channelItems, (x, y) => string.Compare(x.Name.Substring(x.Name.IndexOf('#') + 1), y.Name.Substring(y.Name.IndexOf('#') + 1))); // This is supposed to sort this alphabetically lol
             Channels.SelectedIndex = 0;
+
+            // ChannelDataGrid
+            var channelsCollection = new ObservableCollection<ComboBoxItem>();
+            for(int i = 1; i < channelItems.Length; i++)
+            {
+                channelsCollection.Add(channelItems[i]);
+            }
+
+            ChannelDataGrid.ItemsSource = channelsCollection;
         }
+
 
         void AddChannel(string name, string id)
         {
@@ -411,6 +424,5 @@ namespace InfinityBot
         }
 
         #endregion
-
     }
 }
