@@ -29,8 +29,8 @@ namespace InfinityBot.Commands
             bool IsVote;
             try
             {
-                string owo = text.Substring(text.IndexOf("vote: "));
-                replyText = owo;
+                replyText = text.Substring(text.IndexOf("vote: "));
+                replyText = replyText.Replace("vote: ", string.Empty);
                 IsVote = true;
             }
             catch

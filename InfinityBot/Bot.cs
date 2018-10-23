@@ -384,7 +384,6 @@ namespace InfinityBot
                     {
                         // TODO: add edit command
                         throw new NotImplementedException();
-                        break;
                     }
                 default:
                     {
