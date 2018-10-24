@@ -25,6 +25,7 @@ namespace InfinityBot
 
         DiscordSocketClient client = new DiscordSocketClient();
         CommandService userCommands = new CommandService();
+        CommandService adminCommands = new CommandService();
         readonly IServiceProvider services = new ServiceCollection().BuildServiceProvider();
         
         #region Main
@@ -230,17 +231,32 @@ namespace InfinityBot
 
         private async Task InstallCommands()
         {
-            // Hook the MessageReceived Event into our Command Handler
-            client.MessageReceived += HandleCommand;
-            // Discover all of the commands in this assembly and load them.
-            await userCommands.AddModulesAsync(Assembly.GetEntryAssembly());
+            // User commands
+            client.MessageReceived += HandleUserCommand;
+            await userCommands.AddModuleAsync(typeof(Commands.UserCommands));
+
+            // Admin Commands
+            client.MessageReceived += HandleAdminCommand;
+            await adminCommands.AddModuleAsync(typeof(Commands.AdminCommands));
         }
 
-        private async Task HandleCommand(SocketMessage messageParam)
+        private async Task HandleAdminCommand(SocketMessage messageParam)
         {
-            // Don't process the command if it was a System Message
-            var message = messageParam as SocketUserMessage;
-            if (message == null)
+            if (!(messageParam is SocketUserMessage message))
+                return;
+            int argPos = 0;
+            if (!message.HasCharPrefix('&', ref argPos))
+                return;
+
+            var context = new CommandContext(client, message);
+            var result = await adminCommands.ExecuteAsync(context, argPos, services);
+            if (!result.IsSuccess)
+                await context.Channel.SendMessageAsync(result.ErrorReason);
+        }
+
+        private async Task HandleUserCommand(SocketMessage messageParam)
+        {
+            if (!(messageParam is SocketUserMessage message))
             {
                 return;
             }
@@ -347,6 +363,7 @@ namespace InfinityBot
                             if (messageCount > 100)
                             {
                                 messageCount = 100;
+                                // TODO: make message count allowed over 100
                             }
 
                             var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(messageCount).Flatten();
@@ -399,7 +416,6 @@ namespace InfinityBot
             var guildInfo = client.GetGuild(guildID);
             TerminalUpdate(this, "Added all text channels from guild " + "\"" + guildInfo.Name + "\".");
             AddGuildRequested(this, guildID);
-            
         }
 
         #endregion
