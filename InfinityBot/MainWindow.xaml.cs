@@ -56,9 +56,15 @@ namespace InfinityBot
 
         private Bot bot;
 
-        string SettingsVersion = "0.1.1";
-        string TimePrefix = DateTime.Now + ": ";
-        string logfile = Directory.GetCurrentDirectory() + @"\" + "log.log";
+        readonly string SettingsVersion = "0.1.1";
+        string TimePrefix
+        {
+            get
+            {
+                return DateTime.Now + ": ";
+            }
+        }
+        readonly string logfile = Directory.GetCurrentDirectory() + @"\" + "log.log";
 
         #endregion
 
