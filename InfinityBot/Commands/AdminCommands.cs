@@ -77,7 +77,7 @@ namespace InfinityBot.Commands
             var user = Context.User as SocketGuildUser;
             var permissions = user.GuildPermissions;
 
-            if (permissions.Administrator == true || permissions.ManageMessages == true)
+            if (permissions.Administrator || permissions.ManageMessages)
             {
                 var channel = Context.Channel as ISocketMessageChannel;
                 var msgCollection = await channel.GetMessagesAsync(1).Flatten();
