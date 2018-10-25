@@ -181,13 +181,14 @@ namespace InfinityBot
             await Log(message);
         }
 
-        private Task MessageUpdated(Cacheable<IMessage, ulong> arg1, SocketMessage arg2, ISocketMessageChannel arg3)
+        private Task MessageUpdated(Cacheable<IMessage, ulong> arg1, SocketMessage msg, ISocketMessageChannel arg3)
         {
-            var msg = arg2;
-            var channel = msg.Channel as SocketGuildChannel;
-            string message = "Message Updated | " + channel.Guild.Name + "/#" + channel.Name + "/" + msg.Author + ": ";
-            message += msg.Content;
-            TerminalUpdate(this, message);
+            if (msg != null)
+            {
+                var channel = msg.Channel as SocketGuildChannel;
+                string message = "Message Updated | " + channel.Guild.Name + "/#" + channel.Name + "/" + msg.Author + ": " + msg.Content;
+                TerminalUpdate(this, message);
+            }
             return Task.CompletedTask;
         }
 
