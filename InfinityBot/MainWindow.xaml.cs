@@ -153,34 +153,49 @@ namespace InfinityBot
 
         async void TerminalUpdate(string text)
         {
-            await Dispatcher.BeginInvoke(new Action(() =>
+            try
             {
-                string x = Terminal.Text;
-                if (x == string.Empty)
+                await Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    Terminal.Text += TimePrefix + text;
-                }
-                else
-                {
-                    Terminal.Text += Environment.NewLine + TimePrefix + text;
-                }
-                StatusUpdate(text);
-
-                if (LogFile.IsChecked == true)
-                {
-                    try
+                    string x = Terminal.Text;
+                    if (x == string.Empty)
                     {
-                        string log = File.ReadAllText(logfile);
-                        log += Environment.NewLine + TimePrefix + text;
-                        File.WriteAllText(logfile, log);
+                        Terminal.Text += TimePrefix + text;
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        StatusUpdate("Error: Failed to update log! " + ex.ToString());
+                        Terminal.Text += Environment.NewLine + TimePrefix + text;
                     }
+<<<<<<< HEAD
                 }
             }));
             
+=======
+                    StatusUpdate(text);
+
+                    if (LogFile.IsChecked == true)
+                    {
+                        try
+                        {
+                            string log = File.ReadAllText(logfile);
+                            log += Environment.NewLine + TimePrefix + text;
+                            File.WriteAllText(logfile, log);
+                        }
+                        catch (Exception ex)
+                        {
+                            StatusUpdate("Error: Failed to update log! " + ex.ToString());
+                        }
+                    }
+                }));
+            }
+            catch(Exception ex)
+            {
+                string log = File.ReadAllText(logfile);
+                log += Environment.NewLine + TimePrefix + ex.ToString();
+                File.WriteAllText(logfile, log);
+            }
+
+>>>>>>> master
         }
 
         void TerminalUpdate(string[] text) => Array.ForEach(text, line => TerminalUpdate(line));
