@@ -65,7 +65,7 @@ namespace InfinityBot.Commands
             else
             {
                 var reply = await ReplyAsync("No permission to manage messages.");
-                await Task.Delay(2000);
+                await Task.Delay(5000);
                 await reply.DeleteAsync();
             }
         }
@@ -74,20 +74,31 @@ namespace InfinityBot.Commands
         public async Task Delete()
         {
             await Context.Message.DeleteAsync();
+            var user = Context.User as SocketGuildUser;
+            var permissions = user.GuildPermissions;
 
-            var channel = Context.Channel as ISocketMessageChannel;
-            var msgCollection = await channel.GetMessagesAsync(1).Flatten();
-            var msgArray = msgCollection.ToArray();
-
-            try
+            if (permissions.Administrator == true || permissions.ManageMessages == true)
             {
-                await (channel as ISocketMessageChannel).DeleteMessagesAsync(msgCollection);
+                var channel = Context.Channel as ISocketMessageChannel;
+                var msgCollection = await channel.GetMessagesAsync(1).Flatten();
+                var msgArray = msgCollection.ToArray();
+
+                try
+                {
+                    await (channel as ISocketMessageChannel).DeleteMessagesAsync(msgCollection);
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    var x = await ReplyAsync("No messages to delete.");
+                    await Task.Delay(5000);
+                    await x.DeleteAsync();
+                }
             }
-            catch (IndexOutOfRangeException)
+            else
             {
-                var x = await ReplyAsync("No messages to delete.");
+                var reply = await ReplyAsync("No permission to manage messages.");
                 await Task.Delay(5000);
-                await x.DeleteAsync();
+                await reply.DeleteAsync();
             }
         }
     }
