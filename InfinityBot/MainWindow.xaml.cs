@@ -202,10 +202,13 @@ namespace InfinityBot
         // Status
         async void StatusUpdate(string text)
         {
-            await Dispatcher.BeginInvoke(new Action(() =>
+            if (text != null)
             {
-                Status.Text = text.Replace(TimePrefix, string.Empty);
-            }));
+                await Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    Status.Text = text.Replace(TimePrefix, string.Empty);
+                }));
+            }
         }
         void StatusClear() => Status.Text = string.Empty;
 

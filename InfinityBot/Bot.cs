@@ -234,11 +234,11 @@ namespace InfinityBot
         {
             // User commands
             client.MessageReceived += HandleUserCommand;
-            await userCommands.AddModuleAsync(typeof(Commands.UserCommands));
+            await userCommands.AddModuleAsync(typeof(Commands.UserCommands), services);
 
             // Admin Commands
             client.MessageReceived += HandleAdminCommand;
-            await adminCommands.AddModuleAsync(typeof(Commands.AdminCommands));
+            await adminCommands.AddModuleAsync(typeof(Commands.AdminCommands), services);
         }
 
         private async Task HandleAdminCommand(SocketMessage messageParam)
@@ -343,7 +343,7 @@ namespace InfinityBot
                         }
                         if (parameters == null || parameters == string.Empty)
                         {
-                            var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(1).Flatten();
+                            var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(1).FlattenAsync();
                             var msgArray = msgCollection.ToArray();
 
                             try
@@ -367,7 +367,7 @@ namespace InfinityBot
                                 // TODO: make message count allowed over 100
                             }
 
-                            var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(messageCount).Flatten();
+                            var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(messageCount).FlattenAsync();
 
                             try
                             {
@@ -381,12 +381,12 @@ namespace InfinityBot
                                 if (text != string.Empty)
                                 {
                                     msgCollection = msgCollection.Where(msg => msg.Content.Contains(text));
-                                    await (channel as ISocketMessageChannel).DeleteMessagesAsync(msgCollection);
+                                    await channel.DeleteMessagesAsync(msgCollection);
                                     update = $"Deleted {msgCollection.ToArray().Length} messages containing \"{text}\" from {channel.Guild.Name}/#{channel.Name}.";
                                 }
                                 else
                                 {
-                                    await (channel as ISocketMessageChannel).DeleteMessagesAsync(msgCollection);
+                                    await channel.DeleteMessagesAsync(msgCollection);
                                     update = $"Deleted {msgCollection.ToArray().Length} messages from {channel.Guild.Name}/#{channel.Name}.";
                                 }
                                 TerminalUpdate(this, update);
