@@ -153,34 +153,42 @@ namespace InfinityBot
 
         async void TerminalUpdate(string text)
         {
-            await Dispatcher.BeginInvoke(new Action(() =>
+            try
             {
-                string x = Terminal.Text;
-                if (x == string.Empty)
+                await Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    Terminal.Text += TimePrefix + text;
-                }
-                else
-                {
-                    Terminal.Text += Environment.NewLine + TimePrefix + text;
-                }
-                StatusUpdate(text);
+                    string x = Terminal.Text;
+                    if (x == string.Empty)
+                    {
+                        Terminal.Text += TimePrefix + text;
+                    }
+                    else
+                    {
+                        Terminal.Text += Environment.NewLine + TimePrefix + text;
+                    }
+                    StatusUpdate(text);
 
-                if (LogFile.IsChecked == true)
-                {
-                    try
+                    if (LogFile.IsChecked == true)
                     {
-                        string log = File.ReadAllText(logfile);
-                        log += Environment.NewLine + TimePrefix + text;
-                        File.WriteAllText(logfile, log);
+                        try
+                        {
+                            string log = File.ReadAllText(logfile);
+                            log += Environment.NewLine + TimePrefix + text;
+                            File.WriteAllText(logfile, log);
+                        }
+                        catch (Exception ex)
+                        {
+                            StatusUpdate("Error: Failed to update log! " + ex.ToString());
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        StatusUpdate("Error: Failed to update log! " + ex.ToString());
-                    }
-                }
-            }));
-            
+                }));
+            }
+            catch (Exception ex)
+            {
+                string log = File.ReadAllText(logfile);
+                log += Environment.NewLine + TimePrefix + ex.ToString();
+                File.WriteAllText(logfile, log);
+            }
         }
 
         void TerminalUpdate(string[] text) => Array.ForEach(text, line => TerminalUpdate(line));
@@ -330,7 +338,7 @@ namespace InfinityBot
             catch { }
         }
 
-        #endregion
+        #endregion  
 
         #region Channel Management
 
