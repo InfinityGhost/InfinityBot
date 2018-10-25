@@ -180,6 +180,14 @@ namespace InfinityBot
                     }
                 }
             }));
+                }));
+            }
+            catch (Exception ex)
+            {
+                string log = File.ReadAllText(logfile);
+                log += Environment.NewLine + TimePrefix + ex.ToString();
+                File.WriteAllText(logfile, log);
+            }
         }
 
         void TerminalUpdate(string[] text) => Array.ForEach(text, line => TerminalUpdate(line));
