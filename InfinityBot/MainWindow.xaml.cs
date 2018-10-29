@@ -19,6 +19,7 @@ using System.Reflection;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Clipboard = System.Windows.Clipboard;
 using TextBox = System.Windows.Controls.TextBox;
+using DataGrid = System.Windows.Controls.DataGrid;
 using Discord.WebSocket;
 using System.Collections.ObjectModel;
 
@@ -347,6 +348,8 @@ namespace InfinityBot
 
         ComboBoxItem[] channelItems = { };
 
+        ObservableCollection<ComboBoxItem> channelsCollection = new ObservableCollection<ComboBoxItem>();
+
         void UpdateChannelItems()
         {
             Channels.Items.Clear();
@@ -354,7 +357,7 @@ namespace InfinityBot
             Channels.SelectedIndex = 0;
 
             // ChannelDataGrid
-            var channelsCollection = new ObservableCollection<ComboBoxItem>();
+            channelsCollection = new ObservableCollection<ComboBoxItem>();
             for(int i = 1; i < channelItems.Length; i++)
             {
                 channelsCollection.Add(channelItems[i]);
