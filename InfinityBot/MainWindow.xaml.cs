@@ -39,11 +39,11 @@ namespace InfinityBot
 
         async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            ClearChannels();
+            await ClearChannels();
             try
             {
                 LoadDefault();
-                LoadChannels();
+                await LoadChannels();
                 TerminalUpdate("Ready to start bot. Default settings loaded.");
             }
             catch
@@ -219,7 +219,7 @@ namespace InfinityBot
 
         #region Settings Management
 
-        void Save(string path)
+        Task Save(string path)
         {
             File.WriteAllLines(path, new string[]
             {
@@ -228,8 +228,9 @@ namespace InfinityBot
                 "clientID:" + ClientID.Text,
                 "logToFile:" + LogFile.IsChecked,
             });
+            return Task.CompletedTask;
         }
-        void Load(string path)
+        Task Load(string path)
         {
             var x = File.ReadAllLines(path);
             if (x[0] == "ver:" + SettingsVersion)
@@ -246,17 +247,18 @@ namespace InfinityBot
                         {
                             APIToken.Text = x[1].Replace("apiToken:", string.Empty);
                             ClientID.Text = x[2].Replace("clientID:", string.Empty);
-                            return;
+                            break;
                         }
                     case "ver:0.1.1":
                         {
                             APIToken.Text = x[1].Replace("apiToken:", string.Empty);
                             ClientID.Text = x[2].Replace("clientID:", string.Empty);
                             LogFile.IsChecked = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
-                            return;
+                            break;
                         }
                 }
             }
+            return Task.CompletedTask;
         }
 
         void SaveFile()
@@ -300,13 +302,13 @@ namespace InfinityBot
             }
         }
 
-        void SaveDefault() => Save(Directory.GetCurrentDirectory() + @"\" + "defaults.cfg");
-        void LoadDefault() => Load(Directory.GetCurrentDirectory() + @"\" + "defaults.cfg");
+        async void SaveDefault() => await Save(Directory.GetCurrentDirectory() + @"\" + "defaults.cfg");
+        async void LoadDefault() => await Load(Directory.GetCurrentDirectory() + @"\" + "defaults.cfg");
 
         // Channels
 
-        void SaveChannels(object sender, RoutedEventArgs e) => SaveChannels();
-        void SaveChannels()
+        async void SaveChannels(object sender, RoutedEventArgs e) => await SaveChannels();
+        Task SaveChannels()
         {
             string[] fileContents = { };
             try
@@ -323,10 +325,11 @@ namespace InfinityBot
             {
                 TerminalUpdate("Failed to save channels to file." + Environment.NewLine + ex.ToString());
             }
+            return Task.CompletedTask;
         }
 
-        void LoadChannels(object sender, RoutedEventArgs e) => LoadChannels();
-        void LoadChannels()
+        async void LoadChannels(object sender, RoutedEventArgs e) => await LoadChannels();
+        Task LoadChannels()
         {
             ClearChannels();
             string[] fileContents = File.ReadAllLines(Directory.GetCurrentDirectory() + @"\" + "channels.txt");
@@ -342,6 +345,7 @@ namespace InfinityBot
                 });
             }
             catch { }
+            return Task.CompletedTask;
         }
 
         #endregion
@@ -352,7 +356,7 @@ namespace InfinityBot
 
         ObservableCollection<ComboBoxItem> channelsCollection = new ObservableCollection<ComboBoxItem>();
 
-        void UpdateChannelItems()
+        Task UpdateChannelItems()
         {
             Channels.Items.Clear();
             Array.ForEach(channelItems, item => Channels.Items.Add(item));
@@ -366,10 +370,11 @@ namespace InfinityBot
             }
 
             ChannelDataGrid.ItemsSource = channelsCollection;
+            return Task.CompletedTask;
         }
 
-
-        void AddChannel(string name, string id)
+        async void AddChannel(string name, ulong id) => await AddChannel(name, id.ToString());
+        Task AddChannel(string name, string id)
         {
             Array.Resize(ref channelItems, channelItems.Length + 1);
             channelItems[channelItems.Length - 1] = new ComboBoxItem
@@ -378,11 +383,11 @@ namespace InfinityBot
                 Tag = id,
             };
             UpdateChannelItems();
+            return Task.CompletedTask;
         }
-        void AddChannel(string name, ulong id) => AddChannel(name, id.ToString());
 
-        void ClearChannels(object sender, RoutedEventArgs e) => ClearChannels();
-        void ClearChannels()
+        async void ClearChannels(object sender, RoutedEventArgs e) => await ClearChannels();
+        Task ClearChannels()
         {
             ComboBoxItem[] x =
             {
@@ -394,6 +399,7 @@ namespace InfinityBot
             };
             channelItems = x;
             UpdateChannelItems();
+            return Task.CompletedTask;
         }
 
         private void GetChannels(object sender, ulong e)
@@ -408,7 +414,7 @@ namespace InfinityBot
                 }
             });
         }
-        private void AddChannelRequested(object sender, ulong e)
+        void AddChannelRequested(object sender, ulong e)
         {
             var channel = bot.GetChannel(e);
             var guild = channel.Guild;
