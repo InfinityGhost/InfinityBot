@@ -12,7 +12,7 @@
 
         <!--Menu-->
 
-        <Menu VerticalAlignment="Top">
+        <Menu VerticalAlignment="Top" Background="White">
             <MenuItem Header="File">
                 <MenuItem Header="About..." Click="AboutShow"/>
                 <MenuItem Header="Save settings..." Click="SaveButton"/>
@@ -44,6 +44,7 @@
                                 </TextBlock>
                             </ScrollViewer>
                             <TextBox x:Name="Command" VerticalAlignment="Bottom" KeyDown="TerminalCommand" Background="Black" Foreground="White" Margin="2,0"/>
+                            <Border BorderBrush="Black" IsHitTestVisible="False" VerticalAlignment="Bottom" Height="18" BorderThickness="1,0,1,1" Margin="2,0"/>
                         </Grid>
                     </GroupBox>
                     <ComboBox x:Name="Channels" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,11" Width="200"/>
@@ -87,7 +88,7 @@
 
         <!--StatusBar-->
 
-        <StatusBar VerticalAlignment="Bottom" Height="18">
+        <StatusBar x:Name="StatusBar" VerticalAlignment="Bottom" Height="18" Background="White">
             <TextBlock x:Name="Status" Margin="0,-2" Height="18"/>
         </StatusBar>
 
