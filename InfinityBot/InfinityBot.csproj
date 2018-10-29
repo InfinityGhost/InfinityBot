@@ -273,13 +273,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Commands\Help\HelpMain.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="infinitybot.ico" />
+    <EmbeddedResource Include="infinitybot.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InfinityBot"
         mc:Ignorable="d"
-        Title="InfinityBot" Height="500" Width="800" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+        Title="InfinityBot" Height="500" Width="800" WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded"
+        StateChanged="Window_StateChanged">
     <Grid>
 
         <!--Menu-->

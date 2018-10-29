@@ -36,7 +36,8 @@ namespace InfinityBot
         {
             InitializeComponent();
         }
-        void Window_Loaded(object sender, RoutedEventArgs e)
+
+        async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             ClearChannels();
             try
@@ -50,12 +51,13 @@ namespace InfinityBot
                 TerminalUpdate("Ready to start bot.");
             }
             if (System.Diagnostics.Debugger.IsAttached)
-            {
                 Title += " - Debugging";
-            }
+
+            await NotifyIconStartup();
         }
 
         private Bot bot;
+        private Assembly assembly = Assembly.GetExecutingAssembly();
 
         readonly string SettingsVersion = "0.1.1";
         string TimePrefix
@@ -77,7 +79,7 @@ namespace InfinityBot
             {
                 StartButton.Content = "Stop Bot";
                 bot = new Bot(APIToken.Text);
-                
+
                 // Event handlers
                 {
                     bot.TerminalUpdate += TerminalUpdate;
@@ -317,12 +319,12 @@ namespace InfinityBot
                 File.WriteAllLines(Directory.GetCurrentDirectory() + @"\" + "channels.txt", fileContents);
                 TerminalUpdate("Saved all channels.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TerminalUpdate("Failed to save channels to file." + Environment.NewLine + ex.ToString());
             }
         }
-        
+
         void LoadChannels(object sender, RoutedEventArgs e) => LoadChannels();
         void LoadChannels()
         {
@@ -353,12 +355,12 @@ namespace InfinityBot
         void UpdateChannelItems()
         {
             Channels.Items.Clear();
-            Array.ForEach(channelItems, item => Channels.Items.Add(item)); 
+            Array.ForEach(channelItems, item => Channels.Items.Add(item));
             Channels.SelectedIndex = 0;
 
             // ChannelDataGrid
             channelsCollection = new ObservableCollection<ComboBoxItem>();
-            for(int i = 1; i < channelItems.Length; i++)
+            for (int i = 1; i < channelItems.Length; i++)
             {
                 channelsCollection.Add(channelItems[i]);
             }
@@ -442,6 +444,47 @@ namespace InfinityBot
             string x = "https://discordapp.com/oauth2/authorize?client_id=" + ClientID.Text + @"&scope=bot";
             Clipboard.SetText(x);
             TerminalUpdate("Copied link to clipboard: " + x);
+        }
+
+        #endregion
+
+        #region Tray / Notification icon
+
+        NotifyIcon NotifyIcon = new NotifyIcon();
+
+        private Task NotifyIconStartup()
+        {
+            string icon = @"InfinityBot.infinitybot.ico";
+            NotifyIcon.Icon = new System.Drawing.Icon(assembly.GetManifestResourceStream(icon));
+            NotifyIcon.MouseClick += NotifyIcon_Click;
+
+            return Task.CompletedTask;
+        }
+
+        private void NotifyIcon_Click(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            Show();
+            WindowState = WindowState.Normal;
+        }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            switch (WindowState)
+            {
+                case WindowState.Minimized:
+                    {
+                        ShowInTaskbar = false;
+                        NotifyIcon.Visible = true;
+                        Hide();
+                        break;
+                    }
+                case WindowState.Normal:
+                    {
+                        ShowInTaskbar = true;
+                        NotifyIcon.Visible = false;
+                        break;
+                    }
+            }
         }
 
         #endregion
