@@ -174,24 +174,13 @@ namespace InfinityBot
 
                     if (LogFile.IsChecked == true)
                     {
-                        try
-                        {
-                            string log = File.ReadAllText(logfile);
-                            log += Environment.NewLine + TimePrefix + text;
-                            File.WriteAllText(logfile, log);
-                        }
-                        catch (Exception ex)
-                        {
-                            await StatusUpdate("Error: Failed to update log! " + ex.ToString());
-                        }
+                        await Log(text);
                     }
                 }));
             }
             catch (Exception ex)
             {
-                string log = File.ReadAllText(logfile);
-                log += Environment.NewLine + TimePrefix + ex.ToString();
-                File.WriteAllText(logfile, log);
+                await Log(ex.ToString());
             }
         }
 
@@ -202,6 +191,21 @@ namespace InfinityBot
         // Context Menu
         void TerminalClear(object sender, RoutedEventArgs e) => TerminalClear();
         void TerminalCopy(object sender, RoutedEventArgs e) => Clipboard.SetText(Terminal.Text);
+
+        // Logging
+        async Task Log(string text)
+        {
+            try
+            {
+                string log = File.ReadAllText(logfile);
+                log += Environment.NewLine + TimePrefix + text;
+                File.WriteAllText(logfile, log);
+            }
+            catch (Exception ex)
+            {
+                await StatusUpdate("Error: Failed to update log! " + ex.ToString());
+            }
+        }
 
         // Status
         async Task StatusUpdate(string text)
