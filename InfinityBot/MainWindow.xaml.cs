@@ -73,7 +73,7 @@ namespace InfinityBot
 
         #region Main Bot Controls
 
-        void StartBot(object sender, RoutedEventArgs e)
+        async void StartBot(object sender, RoutedEventArgs e)
         {
             if (StartButton.Content.ToString() == "Start Bot")
             {
@@ -87,9 +87,27 @@ namespace InfinityBot
                     bot.AddChannelRequested += AddChannelRequested;
                 }
 
-                if (bot.Start() == Task.CompletedTask)
+                try
                 {
-                    StartButton.Content = "Start Bot";
+                    await bot.Start();
+                }
+                catch(Exception ex)
+                {
+                    string[] output =
+                    {
+                        ex.Message,
+                        ex.ToString(),
+                        ex.InnerException.ToString(),
+                        ex.Data.ToString(),
+                    };
+                    try
+                    {
+                        TerminalUpdate(output);
+                    }
+                    catch
+                    {
+                        Log(output);
+                    }
                 }
             }
             else
@@ -183,9 +201,9 @@ namespace InfinityBot
                 await Log(ex.ToString());
             }
         }
-
         void TerminalUpdate(string[] text) => Array.ForEach(text, async line => await TerminalUpdate(line));
         async void TerminalUpdate(object sender, string e) => await TerminalUpdate(e);
+
         void TerminalClear() => Terminal.Text = string.Empty;
 
         // Context Menu
@@ -206,6 +224,7 @@ namespace InfinityBot
                 await StatusUpdate("Error: Failed to update log! " + ex.ToString());
             }
         }
+        void Log(string[] text) => Array.ForEach(text, async line => await Log(line));
 
         // Status
         async Task StatusUpdate(string text)
