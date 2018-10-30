@@ -12,7 +12,7 @@ namespace InfinityBot.Commands
 {
     class AdminCommands : ModuleBase
     {
-        // TODO: port all commands from ServerCommands
+        int delay = 5000;
 
         [Command("del"), Summary("Deletes multiple messages.")]
         public async Task Delete([Remainder, Summary("Amount & type")] string prmstring)
@@ -67,7 +67,7 @@ namespace InfinityBot.Commands
             else
             {
                 var reply = await ReplyAsync("No permission to manage messages.");
-                await Task.Delay(5000);
+                await Task.Delay(delay);
                 await reply.DeleteAsync();
             }
         }
@@ -92,14 +92,14 @@ namespace InfinityBot.Commands
                 catch (IndexOutOfRangeException)
                 {
                     var x = await ReplyAsync("No messages to delete.");
-                    await Task.Delay(5000);
+                    await Task.Delay(delay);
                     await x.DeleteAsync();
                 }
             }
             else
             {
                 var reply = await ReplyAsync("No permission to manage messages.");
-                await Task.Delay(5000);
+                await Task.Delay(delay);
                 await reply.DeleteAsync();
             }
         }
@@ -107,12 +107,15 @@ namespace InfinityBot.Commands
         [Command("game"), Summary("Sets active game.")]
         public async Task SetGame([Remainder, Summary("Game title")] string game)
         {
+            await Context.Message.DeleteAsync();
             var user = Context.User as SocketGuildUser;
             if (user.Id == (Context.Client as DiscordSocketClient).CurrentUser.Id || user.Id == 193491406386364425)
             {
                 await (Context.Client as DiscordSocketClient).SetGameAsync(game);
-            }
+                var x = Context.Channel.SendMessageAsync("Game set to " + game).Result;
+                await Task.Delay(delay);
+                await x.DeleteAsync();
+            }   
         }
-        
     }
 }
