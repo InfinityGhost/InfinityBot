@@ -13,6 +13,8 @@ namespace InfinityBot.Commands
 {
     public class UserCommands : ModuleBase
     {
+        int delay = 5000;
+
         [Command("say"), Summary("Echos a message")]
         public async Task Say([Remainder, Summary("The text to echo")] string echo)
         {
@@ -63,7 +65,7 @@ namespace InfinityBot.Commands
         public async Task Despacito()
         {
             await ReplyAsync("https://www.youtube.com/watch?v=kJQP7kiw5Fk");
-            await Task.Delay(500);
+            await Task.Delay(delay);
             await Context.Message.DeleteAsync();
         }
 

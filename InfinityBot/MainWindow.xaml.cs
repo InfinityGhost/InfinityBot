@@ -217,10 +217,10 @@ namespace InfinityBot
             {
                 await Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    if (StatusBar.Background == defaultBG)
+                    if (StatusBar.Background == DefaultBG)
                     {
-                        StatusBar.Background = errorBG;
-                        Status.Foreground = errorText;
+                        StatusBar.Background = ErrorBG;
+                        Status.Foreground = ErrorText;
                     }
                 }));
             }
@@ -228,21 +228,27 @@ namespace InfinityBot
             {
                 await Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    if (StatusBar.Background != defaultBG)
+                    if (StatusBar.Background != DefaultBG)
                     {
-                        StatusBar.Background = defaultBG;
-                        Status.Foreground = defaultText;
+                        StatusBar.Background = DefaultBG;
+                        Status.Foreground = DefaultText;
                     }
                 }));
             }
         }
         void StatusClear() => Status.Text = string.Empty;
 
-        public Brush errorText = new BrushConverter().ConvertFrom("#FFFFFF") as Brush;
-        public Brush errorBG = new BrushConverter().ConvertFrom("#E81123") as Brush;
+        public Brush ErrorText = new BrushConverter().ConvertFrom("#FFFFFF") as Brush;
+        public Brush ErrorBG = new BrushConverter().ConvertFrom("#E81123") as Brush;
 
-        public Brush defaultText = new BrushConverter().ConvertFrom("#FFFFFF") as Brush;
-        public Brush defaultBG = SystemParameters.WindowGlassBrush;
+        public Brush DefaultText = new BrushConverter().ConvertFrom("#FFFFFF") as Brush;
+        public Brush DefaultBG
+        {
+            get
+            {
+                return SystemParameters.WindowGlassBrush;
+            }
+        }
 
 
 
