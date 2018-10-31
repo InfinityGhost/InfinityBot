@@ -511,6 +511,7 @@ namespace InfinityBot
             string icon = @"InfinityBot.infinitybot.ico";
             NotifyIcon.Icon = new System.Drawing.Icon(assembly.GetManifestResourceStream(icon));
             NotifyIcon.MouseClick += NotifyIcon_Click;
+            NotifyIcon.Text = "InfinityBot";
 
             return Task.CompletedTask;
         }
