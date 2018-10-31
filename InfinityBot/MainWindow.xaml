@@ -39,6 +39,7 @@
                                             <MenuItem Header="Clear Terminal" Click="TerminalClear"/>
                                             <MenuItem Header="Copy all"/>
                                             <MenuItem Header="Log all to text file" IsCheckable="True" x:Name="LogFile"/>
+                                            <MenuItem Header="Open log" Click="OpenLogButton"/>
                                         </ContextMenu>
                                     </TextBlock.ContextMenu>
                                 </TextBlock>

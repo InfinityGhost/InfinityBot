@@ -209,6 +209,17 @@ namespace InfinityBot
         // Context Menu
         void TerminalClear(object sender, RoutedEventArgs e) => TerminalClear();
         void TerminalCopy(object sender, RoutedEventArgs e) => Clipboard.SetText(Terminal.Text);
+        async void OpenLogButton(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(logfile);
+            }
+            catch
+            {
+                await TerminalUpdate("Error: No log file to open.");
+            }
+        }
 
         // Logging
         async Task Log(string text)
