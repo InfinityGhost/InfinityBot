@@ -65,7 +65,10 @@ namespace InfinityBot
 
         private Task Log(LogMessage msg)
         {
-            TerminalUpdate(this, msg.Message);
+            if (msg.Message != null)
+            {
+                TerminalUpdate(this, msg.Message);
+            }
             return Task.CompletedTask;
         }
 
@@ -73,48 +76,55 @@ namespace InfinityBot
         {
             lastMessage = msg;
             string message = string.Empty;
-            if(msg.Channel is SocketGuildChannel channel)
+            try
             {
-                message = channel.Guild.Name + "/#" + channel.Name + "/" + msg.Author + ": ";
-            }
-            else if (msg.Channel is SocketDMChannel dm)
-            {
-                var users = dm.Users.ToArray();
-                string userstring = "DM " + "{";
-                for(int i = 0; i < users.Length; i++)
+                if (msg.Channel is SocketGuildChannel channel)
                 {
-                    if(i < users.Length - 1)
+                    message = channel.Guild.Name + "/#" + channel.Name + "/" + msg.Author + ": ";
+                }
+                else if (msg.Channel is SocketDMChannel dm)
+                {
+                    var users = dm.Users.ToArray();
+                    string userstring = "DM " + "{";
+                    for (int i = 0; i < users.Length; i++)
                     {
-                        userstring += users[i].Username + ", ";
+                        if (i < users.Length - 1)
+                        {
+                            userstring += users[i].Username + ", ";
+                        }
+                        else
+                        {
+                            userstring += users[i].Username;
+                        }
                     }
-                    else
+                    message = userstring + "}" + ": ";
+                }
+
+                if (msg.Content.Contains("\n"))
+                {
+                    message += Environment.NewLine + msg.Content;
+                }
+                else
+                {
+                    message += msg.Content;
+                }
+
+                if (msg.Attachments.ToArray() is Attachment[] attachments)
+                {
+                    for (int i = 0; i < attachments.Length; i++)
                     {
-                        userstring += users[i].Username;
+                        message += "{" + attachments[i].Filename + "}";
+
+                        if (i < attachments.Length - 1)
+                        {
+                            message += ", ";
+                        }
                     }
                 }
-                message = userstring + "}" + ": ";
             }
-
-            if (msg.Content.Contains("\n"))
+            catch (Exception ex)
             {
-                message += Environment.NewLine + msg.Content;
-            }
-            else
-            {
-                message += msg.Content;
-            }
-            
-            if (msg.Attachments.ToArray() is Attachment[] attachments)
-            {
-                for (int i = 0; i < attachments.Length; i++)
-                {
-                    message += "{" + attachments[i].Filename + "}";
-
-                    if (i < attachments.Length - 1)
-                    {
-                        message += ", ";
-                    }
-                }
+                message += ex.ToString();
             }
             
             TerminalUpdate(this, message);
@@ -177,8 +187,10 @@ namespace InfinityBot
 
         private async Task MessageReceived(SocketMessage message)
         {
-            // TODO: add private message handling to automatically add to list of channels  
-            await Log(message);
+            if (message.Content != null)
+            {
+                await Log(message);
+            }
         }
 
         private Task MessageUpdated(Cacheable<IMessage, ulong> arg1, SocketMessage msg, ISocketMessageChannel arg3)
