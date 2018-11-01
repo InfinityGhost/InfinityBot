@@ -303,7 +303,7 @@ namespace InfinityBot
             {
                 case "!addguild":
                     {
-                        AddGuildCommand(parameters);
+                        await AddGuildCommand(parameters);
                         break;
                     }
                 case "!addchannel":
@@ -423,12 +423,13 @@ namespace InfinityBot
             }
         }
 
-        private void AddGuildCommand(string parameters)
+        private Task AddGuildCommand(string parameters)
         {
             var guildID = Convert.ToUInt64(parameters);
             var guildInfo = client.GetGuild(guildID);
             TerminalUpdate(this, "Added all text channels from guild " + "\"" + guildInfo.Name + "\".");
             AddGuildRequested(this, guildID);
+            return Task.CompletedTask;
         }
 
         #endregion
