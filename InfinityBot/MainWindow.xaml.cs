@@ -82,9 +82,7 @@ namespace InfinityBot
 
                 // Event handlers
                 {
-                    bot.TerminalUpdate += TerminalUpdate;
-                    bot.AddGuildRequested += GetChannels;
-                    bot.AddChannelRequested += AddChannelRequested;
+                    bot.Output += TerminalUpdate;
                 }
 
                 try
@@ -484,6 +482,7 @@ namespace InfinityBot
                 }
             });
         }
+
         async void AddChannelRequested(object sender, ulong e)
         {
             var channel = bot.GetChannel(e);
