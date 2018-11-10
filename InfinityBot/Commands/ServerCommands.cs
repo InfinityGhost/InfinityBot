@@ -14,19 +14,31 @@ namespace InfinityBot.Commands
         {
             List<string> vs = new List<string>
             {
+                // Object defined methods
+                "add_Output",
+                "remove_Output",
+                "Equals",
+                "GetHashCode",
+                "GetType",
+                "ToString",
+                // User defined methods
                 "ExecuteCommand",
-
             };
 
             ExcludedMethods = new List<MethodInfo>();
 
             vs.ForEach(e => ExcludedMethods.Add(this.GetType().GetMethod(e)));
+
+            List<MethodInfo> methods = this.GetType().GetMethods().ToList();
+            Commands = methods.Except(ExcludedMethods).ToList();
         }
 
         /// <summary>
         /// Excluded methods for commands.
         /// </summary>
         public List<MethodInfo> ExcludedMethods;
+
+        public List<MethodInfo> Commands;
 
         public event EventHandler<object> Output;
 
@@ -40,12 +52,23 @@ namespace InfinityBot.Commands
                 cmdParams,
             };
 
-            List<MethodInfo> methods = this.GetType().GetMethods().ToList();
-            List<MethodInfo> commands = methods.Except(ExcludedMethods).ToList();
-
-            MethodInfo command = commands.Find(e => e.Name == Helper.Capitalize(cmdTitle)) ?? null;
+            MethodInfo command = Commands.Find(cmd => cmd.Name == Helper.Capitalize(cmdTitle)) ?? null;
             if (command != null)
-                command.Invoke(this, invokeParams);
+                try
+                {
+                    command.Invoke(this, invokeParams);
+                }
+                catch
+                {
+                    try
+                    {
+                        command.Invoke(this, null);
+                    }
+                    catch
+                    {
+                        Output(this, "Command parameters are invalid.");
+                    }
+                }
             else
                 Output(this, "Command invalid.");
             return Task.CompletedTask;
@@ -53,8 +76,35 @@ namespace InfinityBot.Commands
 
         public async void Game(Bot bot, string gameTitle)
         {
-            await bot.Client.SetGameAsync(gameTitle);
-            Output(this, "Game set to " + gameTitle);
+            if (gameTitle == "game")
+            {
+                await bot.Client.SetGameAsync(string.Empty);
+                Output(this, "Game reset.");
+            }
+            else
+            {
+                await bot.Client.SetGameAsync(gameTitle);
+                Output(this, "Game set to " + gameTitle);
+            }
+        }
+
+        public void Help()
+        {
+            string vs = string.Empty;
+            List<string> owo = new List<string>
+            {
+                "Server-side commands",
+                "--------------------"
+            };
+            owo.ForEach(line => vs += Environment.NewLine + line);
+            Commands.ForEach(cmd =>
+            {
+                string args = " ";
+                cmd.GetParameters().Skip(1).ToList().ForEach(x => args += "[" + x.ParameterType.Name + "]");
+                vs += Environment.NewLine + cmd.Name + args;
+            });
+            vs += Environment.NewLine + "--------------------";
+            Output(this, vs);
         }
 
     }
