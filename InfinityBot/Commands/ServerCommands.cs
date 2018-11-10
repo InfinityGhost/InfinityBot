@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace InfinityBot.Commands
 {
@@ -45,18 +46,23 @@ namespace InfinityBot.Commands
         public Task ExecuteCommand(Bot bot, string commandParam)
         {
             string cmdTitle = commandParam.Split(' ')[0];
+            MethodInfo command = Commands.Find(cmd => cmd.Name == Helper.Capitalize(cmdTitle)) ?? null;
+            
+            List<ParameterInfo> parameters = command.GetParameters().ToList() ?? new List<ParameterInfo>();
+
             string cmdParams = commandParam.Replace(cmdTitle + " ", string.Empty) ?? string.Empty;
-            object[] invokeParams =
+            List<object> invokeParams = new List<object>
             {
                 bot,
-                cmdParams,
             };
 
-            MethodInfo command = Commands.Find(cmd => cmd.Name == Helper.Capitalize(cmdTitle)) ?? null;
+            if (parameters.ToArray().Length > 1)
+                invokeParams.Add(TypeConverter.ConvertParameter(parameters[1], cmdParams));
+
             if (command != null)
                 try
                 {
-                    command.Invoke(this, invokeParams);
+                    command.Invoke(this, invokeParams.ToArray());
                 }
                 catch
                 {
@@ -70,7 +76,7 @@ namespace InfinityBot.Commands
                     }
                 }
             else
-                Output(this, "Command invalid.");
+                Output(this, "Error: Invalid command. Do /help to get a list of commands.");
             return Task.CompletedTask;
         }
 
@@ -107,5 +113,23 @@ namespace InfinityBot.Commands
             Output(this, vs);
         }
 
+        public void Getguildid(Bot bot)
+        {
+            var channel = bot.Channel as SocketGuildChannel;
+            Output(this, channel.Guild.Name + ".ID:" + channel.Guild.Id);
+            Clipboard.SetText(channel.Guild.Id.ToString());
+        }
+
+        public void Getchannelid(Bot bot)
+        {
+            var channel = bot.Channel as SocketGuildChannel;
+            Output(this, channel.Guild.Name + "/#" + channel.Name + ".ID:" + channel.Id);
+        }
+
+        public void Del(Bot bot, string parameters)
+        {
+            if (bot.Channel is SocketTextChannel textChannel)
+                textChannel.SendMessageAsync($"&del {parameters}");
+        }
     }
 }

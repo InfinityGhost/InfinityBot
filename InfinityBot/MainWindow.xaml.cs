@@ -64,7 +64,7 @@ namespace InfinityBot
         {
             get
             {
-                return DateTime.Now + ": ";
+                return DateTime.Now.ToLocalTime() + ": ";
             }
         }
         readonly string logfile = Directory.GetCurrentDirectory() + @"\" + "log.log";
@@ -75,7 +75,7 @@ namespace InfinityBot
 
         async void StartBot(object sender, RoutedEventArgs e)
         {
-            if (StartButton.Content.ToString() == "Start Bot")
+            if ((string)StartButton.Content == "Start Bot")
             {
                 StartButton.Content = "Stop Bot";
                 bot = new Bot(APIToken.Text);
@@ -110,11 +110,11 @@ namespace InfinityBot
             }
             else
             {
-                KillBot();
+                await bot.Stop();
+                bot = null;
                 StartButton.Content = "Start Bot";
             }
         }
-        private async void KillBot() => await bot.Stop();
 
         #endregion
 
@@ -177,8 +177,7 @@ namespace InfinityBot
             {
                 await Dispatcher.BeginInvoke(new Action(async () =>
                 {
-                    string x = Terminal.Text;
-                    if (x == string.Empty)
+                    if (Terminal.Text == string.Empty)
                     {
                         Terminal.Text += TimePrefix + text;
                     }

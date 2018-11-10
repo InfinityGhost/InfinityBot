@@ -222,6 +222,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Tools\TypeConverter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -241,7 +242,7 @@
     <Compile Include="Commands\AdminCommands.cs" />
     <Compile Include="Commands\UserCommands.cs" />
     <Compile Include="Commands\ServerCommands.cs" />
-    <Compile Include="Helper.cs" />
+    <Compile Include="Tools\Helper.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

@@ -31,7 +31,8 @@ namespace InfinityBot
         Commands.ServerCommands ServerCommands;
         IServiceProvider Services = new ServiceCollection().BuildServiceProvider();
 
-        SocketMessage ReplyMessage;
+        public SocketMessage ReplyMessage;
+        public SocketChannel Channel;
 
         #endregion
 
@@ -52,7 +53,6 @@ namespace InfinityBot
         public async Task Stop()
         {
             await Client.StopAsync();
-            Client = null;
             Output(this, "Bot has been stopped.");
         }
 
@@ -74,6 +74,7 @@ namespace InfinityBot
                 {
                     if (text != string.Empty || text != null)
                         await channel.SendMessageAsync(text);
+                    Channel = channel;
                 }
             }
         }
@@ -83,7 +84,10 @@ namespace InfinityBot
             if(!await HandleServerCommand(text))
             {
                 if (ReplyMessage != null)
+                {
                     await ServerMessage(text, ReplyMessage.Channel as SocketChannel);
+                    Channel = (ReplyMessage.Channel as SocketChannel);
+                }
                 else
                     Output(ReplyMessage, "Message is null.");
             }
