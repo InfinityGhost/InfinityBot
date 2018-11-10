@@ -237,7 +237,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BotOld.cs" />
     <Compile Include="Bot.cs" />
     <Compile Include="Commands\AdminCommands.cs" />
     <Compile Include="Commands\UserCommands.cs" />
