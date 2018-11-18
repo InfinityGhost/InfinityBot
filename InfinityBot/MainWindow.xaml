@@ -86,7 +86,7 @@
                         <GroupBox Header="ClientID">
                             <TextBox x:Name="ClientID"/>
                         </GroupBox>
-                        <Button Content="Get bot invite link" Click="GetInvite"/>
+                        <Button Content="Get invite link" Click="GetInvite"/>
                     </StackPanel>
                     <GroupBox Header="Channels" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="52">
                         <StackPanel Orientation="Horizontal">
