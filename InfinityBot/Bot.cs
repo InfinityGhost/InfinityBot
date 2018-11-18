@@ -225,7 +225,8 @@ namespace InfinityBot
             var result = await UserCommands.ExecuteAsync(context, argPos, Services);
             if (!result.IsSuccess)
             {
-                var reply = await context.Channel.SendMessageAsync("Error!: " + result.ErrorReason);
+                await messageParam.DeleteAsync();
+                var reply = await context.Channel.SendMessageAsync("Error: " + result.ErrorReason);
                 await Task.Delay(Commands.UserCommands.Delay);
                 await reply.DeleteAsync();
             }
@@ -242,7 +243,8 @@ namespace InfinityBot
             var result = await AdminCommands.ExecuteAsync(context, argPos, Services);
             if (!result.IsSuccess)
             {
-                var reply = await context.Channel.SendMessageAsync("Error!: " + result.ErrorReason);
+                await messageParam.DeleteAsync();
+                var reply = await context.Channel.SendMessageAsync("Error: " + result.ErrorReason);
                 await Task.Delay(Commands.UserCommands.Delay);
                 await reply.DeleteAsync();
             }
