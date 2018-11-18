@@ -30,9 +30,9 @@
 
             <TabItem Header="Main">
                 <Grid>
-                    <GroupBox Header="Terminal" Margin="0,0,0,44">
+                    <GroupBox Header="Terminal" Margin="5,5,5,44">
                         <Grid>
-                            <ScrollViewer Margin="2,2,2,18" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
+                            <ScrollViewer Margin="0,0,0,18" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
                                 <TextBlock x:Name="Terminal" Foreground="White" Background="Black" FontFamily="Lucida Console" Padding="2,2,2,2">
                                     <TextBlock.ContextMenu>
                                         <ContextMenu>
@@ -44,38 +44,64 @@
                                     </TextBlock.ContextMenu>
                                 </TextBlock>
                             </ScrollViewer>
-                            <TextBox x:Name="Command" VerticalAlignment="Bottom" KeyDown="TerminalCommand" Background="Black" Foreground="White" Margin="2,0"/>
-                            <Border BorderBrush="Black" IsHitTestVisible="False" VerticalAlignment="Bottom" Height="18" BorderThickness="1,0,1,1" Margin="2,0"/>
+                            <TextBox x:Name="Command" VerticalAlignment="Bottom" KeyDown="TerminalCommand" Background="Black" Foreground="White"/>
+                            <Border BorderBrush="Black" IsHitTestVisible="False" VerticalAlignment="Bottom" Height="18" BorderThickness="1,0,1,1"/>
                         </Grid>
                     </GroupBox>
-                    <ComboBox x:Name="Channels" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,11" Width="200"/>
-                    <Button x:Name="StartButton" HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="Start Bot" Height="24" Width="100" Margin="0,0,0,10" Click="StartBot" IsTabStop="False"/>
+                    <Grid VerticalAlignment="Bottom" Height="44" Margin="10,0,10,0">
+                        <ComboBox x:Name="Channels" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200"/>
+                        <Button x:Name="StartButton" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Start Bot" Height="24" Width="100" Click="StartBot" IsTabStop="False"/>
+                    </Grid>
                 </Grid>
             </TabItem>
 
             <TabItem Header="Settings">
+                <TabItem.Resources>
+                    <Style TargetType="TextBox">
+                        <Setter Property="Height" Value="24"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Padding" Value="2.5"/>
+                    </Style>
+                    <Style TargetType="PasswordBox">
+                        <Setter Property="Height" Value="24"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Padding" Value="2.5"/>
+                    </Style>
+                    <Style TargetType="GroupBox">
+                        <Setter Property="Height" Value="50"/>
+                        <Setter Property="Margin" Value="5"/>
+                    </Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Width" Value="100"/>
+                        <Setter Property="Height" Value="24"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Margin" Value="2.5"/>
+                    </Style>
+                </TabItem.Resources>
                 <Grid>
-                    <GroupBox Header="APIToken" Height="50" VerticalAlignment="Top" Margin="10,10,10,0">
-                        <TextBox x:Name="APIToken" VerticalAlignment="Center" Height="24"/>
-                    </GroupBox>
-                    <GroupBox Margin="10,65,10,0" Height="50" VerticalAlignment="Top" Header="ClientID">
-                        <TextBox x:Name="ClientID" VerticalAlignment="Center" Height="24"/>
-                    </GroupBox>
-                    <Button Content="Get bot invite link" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,120,0,0" Height="24" Width="100" Click="GetInvite"/>
-                    <GroupBox Header="Channels" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="350" Height="57" Margin="10,0,0,10">
-                        <Grid Margin="10,0">
-                            <Button Content="Save channels"  HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="100" Click="SaveChannels"/>
-                            <Button Content="Load channels"  HorizontalAlignment="Center" VerticalAlignment="Center" Height="24" Width="100" Click="LoadChannels"/>
-                            <Button Content="Reset channels" HorizontalAlignment="Right" VerticalAlignment="Center" Height="24" Width="100" Click="ClearChannels"/>
-                        </Grid>
+                    <StackPanel>
+                        <GroupBox Header="APIToken">
+                            <PasswordBox x:Name="APIToken"/>
+                        </GroupBox>
+                        <GroupBox Header="ClientID">
+                            <TextBox x:Name="ClientID"/>
+                        </GroupBox>
+                        <Button Content="Get bot invite link" Click="GetInvite"/>
+                    </StackPanel>
+                    <GroupBox Header="Channels" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="52">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Save channels" Click="SaveChannels"/>
+                            <Button Content="Load channels" Click="LoadChannels"/>
+                            <Button Content="Reset channels" Click="ClearChannels"/>
+                        </StackPanel>
                     </GroupBox>
                 </Grid>
             </TabItem>
 
             <TabItem Header="Channels">
                 <Grid>
-                    <GroupBox Header="Channels">
-                        <DataGrid x:Name="ChannelDataGrid" Background="{x:Null}" Margin="5" AutoGenerateColumns="False" CanUserResizeRows="False" RowHeaderWidth="0">
+                    <GroupBox Header="Channels" Margin="5">
+                        <DataGrid x:Name="ChannelDataGrid" Background="{x:Null}" Margin="2.5" AutoGenerateColumns="False" CanUserResizeRows="False" RowHeaderWidth="0">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Channel Name" Binding="{Binding Content}" Width="200" CanUserResize="False"/>
                                 <DataGridTextColumn x:Name="IDColumn" Header="Channel ID" Binding="{Binding Tag}"/>

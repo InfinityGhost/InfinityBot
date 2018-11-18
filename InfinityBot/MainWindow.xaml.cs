@@ -78,7 +78,7 @@ namespace InfinityBot
             if ((string)StartButton.Content == "Start Bot")
             {
                 StartButton.Content = "Stop Bot";
-                bot = new Bot(APIToken.Text);
+                bot = new Bot(APIToken.Password);
 
                 // Event handlers
                 {
@@ -292,7 +292,7 @@ namespace InfinityBot
             File.WriteAllLines(path, new string[]
             {
                 "ver:" + SettingsVersion,
-                "apiToken:" + APIToken.Text,
+                "apiToken:" + APIToken.Password,
                 "clientID:" + ClientID.Text,
                 "logToFile:" + LogFile.IsChecked,
             });
@@ -303,7 +303,7 @@ namespace InfinityBot
             var x = File.ReadAllLines(path);
             if (x[0] == "ver:" + SettingsVersion)
             {
-                APIToken.Text = x[1].Replace("apiToken:", string.Empty);
+                APIToken.Password = x[1].Replace("apiToken:", string.Empty);
                 ClientID.Text = x[2].Replace("clientID:", string.Empty);
                 LogFile.IsChecked = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
             }
@@ -313,13 +313,13 @@ namespace InfinityBot
                 {
                     case "ver:0.1":
                         {
-                            APIToken.Text = x[1].Replace("apiToken:", string.Empty);
+                            APIToken.Password = x[1].Replace("apiToken:", string.Empty);
                             ClientID.Text = x[2].Replace("clientID:", string.Empty);
                             break;
                         }
                     case "ver:0.1.1":
                         {
-                            APIToken.Text = x[1].Replace("apiToken:", string.Empty);
+                            APIToken.Password = x[1].Replace("apiToken:", string.Empty);
                             ClientID.Text = x[2].Replace("clientID:", string.Empty);
                             LogFile.IsChecked = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
                             break;
