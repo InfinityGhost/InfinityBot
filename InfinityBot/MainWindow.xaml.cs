@@ -293,7 +293,7 @@ namespace InfinityBot
             {
                 "ver:" + SettingsVersion,
                 "apiToken:" + APIToken.Password,
-                "clientID:" + ClientID.Text,
+                "clientID:" + ClientID.Password,
                 "logToFile:" + LogFile.IsChecked,
             });
             return Task.CompletedTask;
@@ -304,7 +304,7 @@ namespace InfinityBot
             if (x[0] == "ver:" + SettingsVersion)
             {
                 APIToken.Password = x[1].Replace("apiToken:", string.Empty);
-                ClientID.Text = x[2].Replace("clientID:", string.Empty);
+                ClientID.Password = x[2].Replace("clientID:", string.Empty);
                 LogFile.IsChecked = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
             }
             else
@@ -314,13 +314,13 @@ namespace InfinityBot
                     case "ver:0.1":
                         {
                             APIToken.Password = x[1].Replace("apiToken:", string.Empty);
-                            ClientID.Text = x[2].Replace("clientID:", string.Empty);
+                            ClientID.Password = x[2].Replace("clientID:", string.Empty);
                             break;
                         }
                     case "ver:0.1.1":
                         {
                             APIToken.Password = x[1].Replace("apiToken:", string.Empty);
-                            ClientID.Text = x[2].Replace("clientID:", string.Empty);
+                            ClientID.Password = x[2].Replace("clientID:", string.Empty);
                             LogFile.IsChecked = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
                             break;
                         }
@@ -557,7 +557,7 @@ namespace InfinityBot
 
         private async void GetInvite(object sender, RoutedEventArgs e)
         {
-            string x = "https://discordapp.com/oauth2/authorize?client_id=" + ClientID.Text + @"&scope=bot";
+            string x = "https://discordapp.com/oauth2/authorize?client_id=" + ClientID.Password + @"&scope=bot";
             Clipboard.SetText(x);
             await TerminalUpdate("Copied link to clipboard: " + x);
         }

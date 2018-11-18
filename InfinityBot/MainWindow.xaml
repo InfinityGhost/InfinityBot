@@ -84,7 +84,7 @@
                             <PasswordBox x:Name="APIToken"/>
                         </GroupBox>
                         <GroupBox Header="ClientID">
-                            <TextBox x:Name="ClientID"/>
+                            <PasswordBox x:Name="ClientID"/>
                         </GroupBox>
                         <Button Content="Get invite link" Click="GetInvite"/>
                     </StackPanel>
