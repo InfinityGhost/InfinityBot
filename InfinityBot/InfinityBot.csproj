@@ -225,6 +225,7 @@
     <Compile Include="AboutBox.xaml.cs">
       <DependentUpon>AboutBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Information.cs" />
     <Compile Include="Tools\TypeConverter.cs" />
     <Page Include="AboutBox.xaml">
       <SubType>Designer</SubType>

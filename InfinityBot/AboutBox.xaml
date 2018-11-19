@@ -26,13 +26,13 @@
                         <Setter Property="Margin" Value="2.5"/>
                     </Style>
                     <Style TargetType="Label">
-                        <Setter Property="Height" Value="24"/>
                         <Setter Property="VerticalAlignment" Value="Center"/>
+                        <EventSetter Event="MouseLeftButtonDown" Handler="OpenContextMenu"/>
                     </Style>
                 </StackPanel.Resources>
 
                 <GroupBox Header="Discord Tag">
-                    <Label x:Name="DiscordTag" MouseLeftButtonDown="DiscordTag_MouseLeftButtonDown">
+                    <Label x:Name="DiscordTag">
                         <Label.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Copy discord tag" Click="CopyTagButton"/>
@@ -47,7 +47,13 @@
                 </GroupBox>
 
                 <GroupBox Header="Website">
-                    <Label x:Name="Website"/>
+                    <Label x:Name="Website">
+                        <Label.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Open website" Click="OpenWebsite"/>
+                            </ContextMenu>
+                        </Label.ContextMenu>
+                    </Label>
                 </GroupBox>
 
             </StackPanel>
@@ -58,7 +64,8 @@
                     VerticalAlignment="Center"
                     Width="100"
                     Height="24"
-                    Click="CloseButton"/>
+                    Click="CloseButton"
+                    IsDefault="True"/>
         </Grid>
     </Grid>
 </Window>
