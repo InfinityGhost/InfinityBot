@@ -57,6 +57,7 @@
                     <Style TargetType="Label">
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <EventSetter Event="MouseLeftButtonDown" Handler="OpenContextMenu"/>
+                        <Setter Property="Cursor" Value="Hand"/>
                     </Style>
                 </StackPanel.Resources>
 
