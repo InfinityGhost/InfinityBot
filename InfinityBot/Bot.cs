@@ -60,6 +60,7 @@ namespace InfinityBot
         {
             await InstallCommands();
             Output(this, "Username: " + Client.CurrentUser.Username);
+            await Client.SetGameAsync(Information.AssemblyVersion);
         }
 
         #endregion
