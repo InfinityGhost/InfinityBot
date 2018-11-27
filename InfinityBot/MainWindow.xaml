@@ -87,6 +87,7 @@
                             <PasswordBox x:Name="ClientID"/>
                         </GroupBox>
                         <Button Content="Get invite link" Click="GetInvite"/>
+                        <Button Content="Lavalink Config" Click="LavaLinkConfigButton"/>
                     </StackPanel>
                     <GroupBox Header="Channels" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="52">
                         <StackPanel Orientation="Horizontal">

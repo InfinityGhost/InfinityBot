@@ -226,8 +226,17 @@
       <DependentUpon>AboutBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="Information.cs" />
+    <Compile Include="Lavalink\Config.cs" />
+    <Compile Include="Lavalink\Lavalink Config.xaml.cs">
+      <DependentUpon>Lavalink Config.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Lavalink\YMLHandler.cs" />
     <Compile Include="Tools\TypeConverter.cs" />
     <Page Include="AboutBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Lavalink\Lavalink Config.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

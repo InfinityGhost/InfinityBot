@@ -1,0 +1,119 @@
+﻿<Window x:Class="InfinityBot.Lavalink.Lavalink_Config"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:InfinityBot.Lavalink"
+        mc:Ignorable="d"
+        Title="Lavalink Configuration"
+        Width="450" Height="450" WindowStartupLocation="CenterScreen"
+        >
+    <Grid>
+        <TabControl Margin="5,5,5,50">
+            <TabControl.Resources>
+                <Style TargetType="GroupBox">
+                    <Setter Property="Height" Value="50"/>
+                    <Setter Property="Margin" Value="0,2.5,0,2.5"/>
+                </Style>
+                <Style TargetType="TextBox">
+                    <Setter Property="Height" Value="24"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+                <Style TargetType="PasswordBox">
+                    <Setter Property="Height" Value="24"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Orientation" Value="Vertical"/>
+                    <Setter Property="Margin" Value="5"/>
+                </Style>
+                <Style TargetType="CheckBox">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                    <Setter Property="Margin" Value="2.5"/>
+                </Style>
+                <Style TargetType="Label">
+                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                    <Setter Property="IsHitTestVisible" Value="False"/>
+                </Style>
+            </TabControl.Resources>
+            
+            
+            <TabItem Header="Server">
+                <StackPanel>
+
+                    <GroupBox Header="Password">
+                        <PasswordBox x:Name="Password"/>
+                    </GroupBox>
+
+                    <GroupBox Header="Buffer Duration">
+                        <Grid>
+                            <TextBox x:Name="BufferDurationMS"/>
+                            <Label Content="ms"/>
+                        </Grid>
+                    </GroupBox>
+
+                    <GroupBox Header="Playlist Load Limit">
+                        <TextBox x:Name="YoutubePlaylistLoadLimit"/>
+                    </GroupBox>
+
+                    <CheckBox Content="Garbage Collection Warnings"
+                              x:Name="GCWarnings"/>
+
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Networking">
+                <StackPanel>
+
+                    <GroupBox Header="Address">
+                        <TextBox x:Name="IPAddress"/>
+                    </GroupBox>
+
+                    <GroupBox Header="Port">
+                        <TextBox x:Name="IPAddressPort"/>
+                    </GroupBox>
+                    
+                    
+                    
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Sources">
+                <StackPanel>
+                    <GroupBox Header="Sources" Height="Auto">
+                        <StackPanel>
+                            <CheckBox Content="YouTube" x:Name="YouTubeSource"/>
+                            <CheckBox Content="Bandcamp" x:Name="BandcampSource"/>
+                            <CheckBox Content="SoundCloud" x:Name="SoundCloudSource"/>
+                            <CheckBox Content="Twitch" x:Name="TwitchSource"/>
+                            <CheckBox Content="Vimeo" x:Name="VimeoSource"/>
+                            <CheckBox Content="Mixer" x:Name="MixerSource"/>
+                            <CheckBox Content="HTTP" x:Name="HTTPSource"/>
+                            <CheckBox Content="Local" x:Name="LocalSource"/>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </TabItem>
+                
+        </TabControl>
+
+        <Grid VerticalAlignment="Bottom" Height="50" Margin="5,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Width" Value="75"/>
+                        <Setter Property="Height" Value="24"/>
+                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                        <Setter Property="Margin" Value="2.5"/>
+                    </Style>
+                </StackPanel.Resources>
+
+                <Button Content="OK"/>
+                <Button Content="Cancel"/>
+                <Button Content="Apply"/>
+            </StackPanel>
+        </Grid>
+        
+    </Grid>
+</Window>

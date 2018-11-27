@@ -69,6 +69,8 @@ namespace InfinityBot
         }
         readonly string logfile = Directory.GetCurrentDirectory() + @"\" + "log.log";
 
+        private Lavalink.Lavalink_Config LavaLinkWindow = new Lavalink.Lavalink_Config();
+
         #endregion
 
         #region Main Bot Controls
@@ -560,6 +562,17 @@ namespace InfinityBot
             string x = "https://discordapp.com/oauth2/authorize?client_id=" + ClientID.Password + @"&scope=bot";
             Clipboard.SetText(x);
             await TerminalUpdate("Copied link to clipboard: " + x);
+        }
+
+        #endregion
+
+        #region LavaLink
+
+        void LavaLinkConfigButton(object sender, RoutedEventArgs e)
+        {
+            if (LavaLinkWindow.IsActive != true)
+                LavaLinkWindow = new Lavalink.Lavalink_Config();
+            LavaLinkWindow.Show();
         }
 
         #endregion
