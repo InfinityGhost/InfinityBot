@@ -43,17 +43,29 @@ namespace InfinityBot.Lavalink
 
         public int GetInt(string property)
         {
-            return Convert.ToInt32(FetchProperty(property + ": "));
+            var fetch = FetchProperty(property + ": ");
+            int lastSpace = 0;
+            try
+            {
+                lastSpace = fetch.IndexOf(" ");
+                return Convert.ToInt32(fetch.Remove(lastSpace, fetch.Length - lastSpace));
+            }
+            catch
+            {
+                return Convert.ToInt32(fetch);
+            }
         }
 
         private string FetchProperty(string propertyTitle)
         {
-            if (Contents.Find(x => x.StartsWith(propertyTitle)) == null)
+            if (Contents.Find(x => x.Contains(propertyTitle)) == null)
                 return string.Empty;
-            IEnumerable<string> search = Contents.Where(line => line.StartsWith(propertyTitle));
+            IEnumerable<string> search = Contents.Where(line => line.Contains(propertyTitle));
             if (search.First() == null)
-                return string.Empty;
-            return search.First().Replace(propertyTitle, string.Empty);
+                throw new NullReferenceException();
+            var fullLine = search.First().Trim();
+            var ret = fullLine.Replace(propertyTitle, string.Empty);
+            return ret;
         }
 
         #endregion

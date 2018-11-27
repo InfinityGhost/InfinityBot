@@ -6,8 +6,9 @@
         xmlns:local="clr-namespace:InfinityBot.Lavalink"
         mc:Ignorable="d"
         Title="Lavalink Configuration"
-        Width="450" Height="450" WindowStartupLocation="CenterScreen"
-        >
+        Width="450" Height="450" 
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="Height">
     <Grid>
         <TabControl Margin="5,5,5,50">
             <TabControl.Resources>

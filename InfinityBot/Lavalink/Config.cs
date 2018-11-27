@@ -12,10 +12,7 @@ namespace InfinityBot.Lavalink
 
         public Config(string path)
         {
-            // TODO: add lavalink config loader
-
             var cfg = new YMLHandler(path);
-
             try
             {
                 Server = new ServerProperties
@@ -44,7 +41,7 @@ namespace InfinityBot.Lavalink
             }
             catch (Exception ex)
             {
-                System.IO.File.AppendAllText("errorDump.log", $"{DateTime.Now.ToLocalTime()}: {ex}");
+                System.IO.File.AppendAllText("errorDump.log", $"{DateTime.Now.ToLocalTime()}: {ex}" + Environment.NewLine);
             }
         }
 
