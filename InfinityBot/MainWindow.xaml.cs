@@ -60,13 +60,7 @@ namespace InfinityBot
         private Assembly assembly = Assembly.GetExecutingAssembly();
 
         readonly string SettingsVersion = "0.1.1";
-        string TimePrefix
-        {
-            get
-            {
-                return DateTime.Now.ToLocalTime() + ": ";
-            }
-        }
+        string TimePrefix => DateTime.Now.ToLocalTime() + ": ";
         readonly string logfile = Directory.GetCurrentDirectory() + @"\" + "log.log";
 
         #endregion
@@ -223,9 +217,7 @@ namespace InfinityBot
         {
             try
             {
-                string log = File.ReadAllText(logfile);
-                log += Environment.NewLine + TimePrefix + text;
-                File.WriteAllText(logfile, log);
+                File.AppendAllText(logfile, Environment.NewLine + TimePrefix + text);
             }
             catch (Exception ex)
             {
