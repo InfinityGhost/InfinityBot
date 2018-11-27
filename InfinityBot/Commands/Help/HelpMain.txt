@@ -1,7 +1,7 @@
 ﻿# InfinityBot
 	by @InfinityGhost#7843
 
-!help <topic>   | Gets you help!
-!say <string>   | Makes the bot say something.
-!pin            | Pings the bot
-!despacito      | Alexa play despacito
+$help <topic>   | Displays help based on topics.
+$say <string>   | Makes the bot say something.
+$pin            | Pings the bot.
+$despacito      | Alexa, play despacito.
