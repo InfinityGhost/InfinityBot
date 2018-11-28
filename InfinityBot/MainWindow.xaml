@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:InfinityBot"
         mc:Ignorable="d"
         Title="InfinityBot" Height="500" Width="800" WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded"
+        Loaded="Window_Loaded" Closed="Window_Closed"
         StateChanged="Window_StateChanged">
     <Grid>
 

@@ -56,14 +56,20 @@ namespace InfinityBot
             await NotifyIconStartup();
         }
 
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Environment.Exit(0x0);
+        }
+
         private Bot bot;
         private Assembly assembly = Assembly.GetExecutingAssembly();
 
-        readonly string SettingsVersion = "0.1.1";
+        readonly string SettingsVersion = "0.2.0";
         string TimePrefix => DateTime.Now.ToLocalTime() + ": ";
         readonly string logfile = Directory.GetCurrentDirectory() + @"\" + "log.log";
 
         private Lavalink.Lavalink_Config LavaLinkWindow = new Lavalink.Lavalink_Config();
+        public string JREPath;
 
         #endregion
 
@@ -289,36 +295,36 @@ namespace InfinityBot
                 "apiToken:" + APIToken.Password,
                 "clientID:" + ClientID.Password,
                 "logToFile:" + LogFile.IsChecked,
+                "jre: " + JREPath,
             });
             return Task.CompletedTask;
         }
         Task Load(string path)
         {
             var x = File.ReadAllLines(path);
-            if (x[0] == "ver:" + SettingsVersion)
+            switch (x[0])
             {
-                APIToken.Password = x[1].Replace("apiToken:", string.Empty);
-                ClientID.Password = x[2].Replace("clientID:", string.Empty);
-                LogFile.IsChecked = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
-            }
-            else
-            {
-                switch (x[0])
-                {
-                    case "ver:0.1":
-                        {
-                            APIToken.Password = x[1].Replace("apiToken:", string.Empty);
-                            ClientID.Password = x[2].Replace("clientID:", string.Empty);
-                            break;
-                        }
-                    case "ver:0.1.1":
-                        {
-                            APIToken.Password = x[1].Replace("apiToken:", string.Empty);
-                            ClientID.Password = x[2].Replace("clientID:", string.Empty);
-                            LogFile.IsChecked = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
-                            break;
-                        }
-                }
+                case "ver:0.1":
+                    {
+                        APIToken.Password = x[1].Replace("apiToken:", string.Empty);
+                        ClientID.Password = x[2].Replace("clientID:", string.Empty);
+                        break;
+                    }
+                case "ver:0.1.1":
+                    {
+                        APIToken.Password = x[1].Replace("apiToken:", string.Empty);
+                        ClientID.Password = x[2].Replace("clientID:", string.Empty);
+                        LogFile.IsChecked = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
+                        break;
+                    }
+                case "ver:0.2.0":
+                    {
+                        APIToken.Password = x[1].Replace("apiToken:", string.Empty);
+                        ClientID.Password = x[2].Replace("clientID:", string.Empty);
+                        LogFile.IsChecked = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
+                        JREPath = x[4];
+                        break;
+                    }
             }
             return Task.CompletedTask;
         }
@@ -568,5 +574,6 @@ namespace InfinityBot
         }
 
         #endregion
+
     }
 }

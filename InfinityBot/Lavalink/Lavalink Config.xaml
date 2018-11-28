@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:InfinityBot.Lavalink"
         mc:Ignorable="d"
         Title="Lavalink Configuration"
-        Width="450" Height="450" 
+        Width="450" Height="450"
+        MinHeight="242"
         WindowStartupLocation="CenterScreen"
         SizeToContent="Height">
     <Grid>
@@ -20,11 +21,13 @@
                     <Setter Property="Height" Value="24"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <EventSetter Event="TextChanged" Handler="SettingsUpdated"/>
                 </Style>
                 <Style TargetType="PasswordBox">
                     <Setter Property="Height" Value="24"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <EventSetter Event="PasswordChanged" Handler="SettingsUpdated"/>
                 </Style>
                 <Style TargetType="StackPanel">
                     <Setter Property="Orientation" Value="Vertical"/>
@@ -34,16 +37,25 @@
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="HorizontalAlignment" Value="Left"/>
                     <Setter Property="Margin" Value="2.5"/>
+                    <EventSetter Event="Click" Handler="SettingsUpdated"/>
                 </Style>
                 <Style TargetType="Label">
                     <Setter Property="HorizontalAlignment" Value="Right"/>
                     <Setter Property="IsHitTestVisible" Value="False"/>
                 </Style>
             </TabControl.Resources>
-            
-            
+
+
             <TabItem Header="Server">
                 <StackPanel>
+
+                    <GroupBox Header="JRE 11 Install Location">
+                        <Grid>
+                            <TextBox Margin="0,0,82.5,0" x:Name="JREbox"/>
+                            <Button HorizontalAlignment="Right" Width="79" Margin="0,3,-3,2"
+                                    Content="Find..." Click="FindJRE"/>
+                        </Grid>
+                    </GroupBox>
 
                     <GroupBox Header="Password">
                         <PasswordBox x:Name="Password"/>
@@ -75,9 +87,9 @@
                     <GroupBox Header="Port">
                         <TextBox x:Name="IPAddressPort"/>
                     </GroupBox>
-                    
-                    
-                    
+
+
+
                 </StackPanel>
             </TabItem>
             <TabItem Header="Sources">
@@ -96,7 +108,7 @@
                     </GroupBox>
                 </StackPanel>
             </TabItem>
-                
+            
         </TabControl>
 
         <Grid VerticalAlignment="Bottom" Height="50" Margin="5,0">
@@ -110,11 +122,11 @@
                     </Style>
                 </StackPanel.Resources>
 
-                <Button Content="OK"/>
-                <Button Content="Cancel"/>
-                <Button Content="Apply"/>
+                <Button Content="OK" Click="OKButton"/>
+                <Button Content="Cancel" Click="CancelButton"/>
+                <Button Content="Apply" Click="ApplyButton"/>
             </StackPanel>
         </Grid>
-        
+
     </Grid>
 </Window>

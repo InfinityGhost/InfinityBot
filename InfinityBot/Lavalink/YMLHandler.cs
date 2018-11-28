@@ -26,7 +26,7 @@ namespace InfinityBot.Lavalink
 
         public bool GetBool(string property)
         {
-            var x = FetchProperty(property + ": ");
+            var x = FetchProperty(property + ": ").ToLower();
             if (x.Contains("true"))
             {
                 return true;

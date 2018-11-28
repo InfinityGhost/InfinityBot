@@ -12,6 +12,7 @@ namespace InfinityBot.Lavalink
 
         public Config(string path)
         {
+            Path = path;
             var cfg = new YMLHandler(path);
             try
             {
@@ -45,6 +46,8 @@ namespace InfinityBot.Lavalink
             }
         }
 
+        public string Path;
+
         public ServerProperties Server;
         public LavalinkProperties Lavalink;
 
@@ -75,6 +78,59 @@ namespace InfinityBot.Lavalink
                 public bool HTTP;
                 public bool Local;
             }
+        }
+
+        #endregion
+
+        #region Writing
+
+        public void Write() => Write(Path);
+        public Task Write(string path)
+        {
+            List<string> vs = new List<string>
+            {
+                "server:",
+                "  port: " + Server.Port,
+                "  address: " + Server.Address,
+                "spring:",
+                "  main:",
+                "    banner-mode: log",
+                "lavalink:",
+                "  server:",
+               $"    password: \"{Lavalink.Password}\"",
+                "    sources:",
+                "      youtube: " + Lavalink.Sources.YouTube.ToString().ToLower(),
+                "      bandcamp: " + Lavalink.Sources.Bandcamp.ToString().ToLower(),
+                "      soundcloud: " + Lavalink.Sources.SoundCloud.ToString().ToLower(),
+                "      twitch: " + Lavalink.Sources.Twitch.ToString().ToLower(),
+                "      vimeo: " + Lavalink.Sources.Vimeo.ToString().ToLower(),
+                "      mixer: " + Lavalink.Sources.Mixer.ToString().ToLower(),
+                "      http: " + Lavalink.Sources.HTTP.ToString().ToLower(),
+                "      local: " + Lavalink.Sources.Local.ToString().ToLower(),
+                "    bufferDurationMs: " + Lavalink.BufferDuration,
+                "    youtubePlaylistLoadLimit: " + Lavalink.LoadLimit,
+                "    gc-warnings: " + Lavalink.GarbageCollectionWarnings.ToString().ToLower(),
+                string.Empty,
+                "metrics:",
+                "  prometheus:",
+                "    enabled: false",
+                "    endpoint: /metrics",
+                string.Empty,
+                "sentry:",
+                "  dsn: \"\"",
+                string.Empty,
+                "logging:",
+                "  file:",
+                "    max-history: 30",
+                "    max-size: 1GB",
+                "  path: ./logs/",
+                string.Empty,
+                "  level:",
+                "    root: INFO",
+                "    lavalink: INFO"
+            };
+            System.IO.File.WriteAllLines(path, vs.ToArray());
+            return Task.CompletedTask;
         }
 
         #endregion

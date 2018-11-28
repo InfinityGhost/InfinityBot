@@ -28,9 +28,14 @@ namespace InfinityBot.Lavalink
                 UpdateUI();
             }
             catch { }
-        }
 
-        // TODO: add config handler
+            Window[] windows = { };
+            Array.Resize(ref windows, Application.Current.Windows.Count);
+            Application.Current.Windows.CopyTo(windows, 0);
+            MainWindow = windows.ToList().FirstOrDefault(e => e is MainWindow) as MainWindow;
+
+            JREbox.Text = MainWindow?.JREPath;
+        }
 
         private Task UpdateUI()
         {
@@ -49,36 +54,103 @@ namespace InfinityBot.Lavalink
             IPAddressPort.Text = server.Port;
 
             // Sources tab
-            UpdateCheckbox(YouTubeSource, sources.YouTube);
-            UpdateCheckbox(BandcampSource, sources.Bandcamp);
-            UpdateCheckbox(SoundCloudSource, sources.SoundCloud);
-            UpdateCheckbox(TwitchSource, sources.Twitch);
-            UpdateCheckbox(VimeoSource, sources.Vimeo);
-            UpdateCheckbox(MixerSource, sources.Mixer);
-            UpdateCheckbox(HTTPSource, sources.HTTP);
-            UpdateCheckbox(LocalSource, sources.Local);
+            SetCheckboxValue(YouTubeSource, sources.YouTube);
+            SetCheckboxValue(BandcampSource, sources.Bandcamp);
+            SetCheckboxValue(SoundCloudSource, sources.SoundCloud);
+            SetCheckboxValue(TwitchSource, sources.Twitch);
+            SetCheckboxValue(VimeoSource, sources.Vimeo);
+            SetCheckboxValue(MixerSource, sources.Mixer);
+            SetCheckboxValue(HTTPSource, sources.HTTP);
+            SetCheckboxValue(LocalSource, sources.Local);
 
             return Task.CompletedTask;
         }
-
-        private void SettingsUpdated(object sender)
-        {
-            switch (sender.GetType().Name)
-            {
-                default:
-                    {
-                        System.IO.File.AppendAllText("settingsUpdated.log", $"{DateTime.Now.ToLocalTime()}: {sender.GetType().Name}" + Environment.NewLine);
-                        break;
-                    }
-            }
-        }
+        private MainWindow MainWindow;
 
         void SettingsUpdated(object sender, RoutedEventArgs e) => SettingsUpdated(sender);
         void SettingsUpdated(object sender, TextChangedEventArgs e) => SettingsUpdated(sender);
+        private void SettingsUpdated(object sender)
+        {
+            if (IsLoaded)
+                switch (sender.GetType().Name)
+                {
+                    case "TextBox":
+                        {
+                            try
+                            {
+                                Configuration.Lavalink.BufferDuration = Convert.ToInt32(BufferDurationMS.Text);
+                                Configuration.Lavalink.LoadLimit = Convert.ToInt32(YoutubePlaylistLoadLimit.Text);
+                            }
+                            catch { }
+                            Configuration.Server.Address = IPAddress.Text;
+                            Configuration.Server.Port = IPAddressPort.Text;
+                            MainWindow.JREPath = JREbox.Text;
+                            break;
+                        }
+                    case "PasswordBox":
+                        {
+                            Configuration.Lavalink.Password = Password.Password;
+                            break;
+                        }
+                    case "CheckBox":
+                        {
+                            var sources = Configuration.Lavalink.Sources;
+                            Configuration.Lavalink.GarbageCollectionWarnings = GCWarnings.IsChecked ?? false;
+                            sources.YouTube = YouTubeSource.IsChecked ?? false;
+                            sources.Bandcamp = BandcampSource.IsChecked ?? false;
+                            sources.SoundCloud = SoundCloudSource.IsChecked ?? false;
+                            sources.Twitch = TwitchSource.IsChecked ?? false;
+                            sources.Vimeo = VimeoSource.IsChecked ?? false;
+                            sources.Mixer = MixerSource.IsChecked ?? false;
+                            sources.HTTP = HTTPSource.IsChecked ?? false;
+                            sources.Local = LocalSource.IsChecked ?? false;
+                            break;
+                        }
+                    default:
+                        {
+                            System.IO.File.AppendAllText("settingsUpdated.log", $"{DateTime.Now.ToLocalTime()}: {sender.GetType().Name}" + Environment.NewLine);
+                            break;
+                        }
+                }
+        }
 
         private Config Configuration;
 
-        private void UpdateCheckbox(CheckBox checkBox, bool value) => checkBox.IsChecked = value;
+        #region Main Buttons
+
+        void OKButton(object sender, RoutedEventArgs e)
+        {
+            Configuration.Write();
+            this.Close();
+        }
+
+        void CancelButton(object sender, RoutedEventArgs e) => this.Close();
+
+        void ApplyButton(object sender, RoutedEventArgs e)
+        {
+            Configuration.Write();
+        }
+
+        void FindJRE(object sender, RoutedEventArgs e)
+        {
+            var dialog = new System.Windows.Forms.OpenFileDialog
+            {
+                Filter = "Java Executable (*.exe)|*.exe|All files (*.*)|*.*",
+                InitialDirectory = @"C:\Program Files\Java",
+                RestoreDirectory = true,
+            };
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                JREbox.Text = dialog.FileName;
+        }
+
+        #endregion
+
+
+        #region Tools
+
+        private void SetCheckboxValue(CheckBox checkBox, bool value) => checkBox.IsChecked = value;
+
+        #endregion
 
     }
 }
