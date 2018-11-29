@@ -64,6 +64,11 @@ namespace InfinityBot
 
         private void Window_Closed(object sender, EventArgs e)
         {
+            try
+            {
+                Lavalink.Kill();
+            }
+            catch { }
             Environment.Exit(0x0);
         }
 
@@ -593,6 +598,7 @@ namespace InfinityBot
                     },
                 };
                 Lavalink.Start();
+                
                 await TerminalUpdate("Lavalink started.");
                 Lavalink.Exited += Lavalink_Exited;
             }
