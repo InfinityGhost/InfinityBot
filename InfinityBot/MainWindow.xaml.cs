@@ -56,6 +56,12 @@ namespace InfinityBot
             await NotifyIconStartup();
         }
 
+        private async void Lavalink_Exited(object sender, EventArgs e)
+        {
+            await TerminalUpdate("Lavalink has exited.");
+            Lavalink = null;
+        }
+
         private void Window_Closed(object sender, EventArgs e)
         {
             Environment.Exit(0x0);
@@ -70,6 +76,7 @@ namespace InfinityBot
 
         private Lavalink.Lavalink_Config LavaLinkWindow = new Lavalink.Lavalink_Config();
         public string JREPath;
+        public System.Diagnostics.Process Lavalink;
 
         #endregion
 
@@ -295,7 +302,7 @@ namespace InfinityBot
                 "apiToken:" + APIToken.Password,
                 "clientID:" + ClientID.Password,
                 "logToFile:" + LogFile.IsChecked,
-                "jre: " + JREPath,
+                "jre:" + JREPath,
             });
             return Task.CompletedTask;
         }
@@ -322,7 +329,7 @@ namespace InfinityBot
                         APIToken.Password = x[1].Replace("apiToken:", string.Empty);
                         ClientID.Password = x[2].Replace("clientID:", string.Empty);
                         LogFile.IsChecked = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
-                        JREPath = x[4];
+                        JREPath = x[4].Replace("jre:", string.Empty);
                         break;
                     }
             }
@@ -573,6 +580,39 @@ namespace InfinityBot
             LavaLinkWindow.Show();
         }
 
+        async void LavaLinkControl(object sender, RoutedEventArgs e)
+        {
+            if (Lavalink == null)
+            {
+                Lavalink = new System.Diagnostics.Process
+                {
+                    StartInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = JREPath,
+                        Arguments = "-jar " + Directory.GetCurrentDirectory() + @"\Lavalink\Lavalink.jar",
+                    },
+                };
+                Lavalink.Start();
+                await TerminalUpdate("Lavalink started.");
+                await Lavalink.WaitForExit();
+
+            }
+            else
+            {
+                try
+                {
+                    Lavalink.Kill();
+                    await TerminalUpdate("Lavalink stopped.");
+                    Lavalink = null;
+                }
+                catch
+                {
+                    Lavalink = null;
+                    await TerminalUpdate("Lavalink was already stopped externally.");
+                }
+            }
+        }
+        
         #endregion
 
     }

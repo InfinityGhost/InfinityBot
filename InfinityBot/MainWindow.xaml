@@ -22,6 +22,7 @@
             </MenuItem>
             <MenuItem Header="Lavalink">
                 <MenuItem Header="Lavalink Configuration..." Click="LavaLinkConfigButton"/>
+                <MenuItem Header="Start/Stop Lavalink" Click="LavaLinkControl"/>
             </MenuItem>
         </Menu>
 
