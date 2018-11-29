@@ -594,8 +594,7 @@ namespace InfinityBot
                 };
                 Lavalink.Start();
                 await TerminalUpdate("Lavalink started.");
-                await Lavalink.WaitForExit();
-
+                Lavalink.Exited += Lavalink_Exited;
             }
             else
             {
