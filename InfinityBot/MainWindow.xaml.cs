@@ -58,7 +58,36 @@ namespace InfinityBot
 
         private async void Lavalink_Exited(object sender, EventArgs e)
         {
-            await TerminalUpdate("Lavalink has exited.");
+            var process = sender as System.Diagnostics.Process;
+            var exitcode = process.ExitCode;
+            switch (exitcode)
+            {
+                case -1:
+                    {
+                        await TerminalUpdate("Lavalink process stopped.");
+                        break;
+                    }
+                case 1:
+                    {
+                        string output = "Lavalink process crashed!" + Environment.NewLine;
+                        string logfile = Directory.GetCurrentDirectory() + @"\Lavalink\logs\spring.log";
+                        List<string> lines = File.ReadAllLines(logfile).ToList();
+                        lines = lines.Skip(lines.ToArray().Length - 5).Take(5).ToList();
+                        lines.Insert(0, $"--- {Directory.GetCurrentDirectory()}\\Lavalink\\logs\\spring.log ---");
+                        lines.Add($"--- end of file ---");
+                        lines.ForEach(x => output += x + Environment.NewLine);
+                        await TerminalUpdate(output);
+                        await TerminalUpdate("Restarting lavalink process...");
+                        Lavalink = null;
+                        LavaLinkControl();
+                        return;
+                    }
+                default:
+                    {
+                        await TerminalUpdate("Lavalink process exited with code " + exitcode);
+                        break;
+                    }
+            }
             Lavalink = null;
         }
 
@@ -585,7 +614,8 @@ namespace InfinityBot
             LavaLinkWindow.Show();
         }
 
-        async void LavaLinkControl(object sender, RoutedEventArgs e)
+        void LavaLinkControl(object sender, RoutedEventArgs e) => LavaLinkControl();
+        async void LavaLinkControl()
         {
             if (Lavalink == null)
             {
@@ -595,27 +625,25 @@ namespace InfinityBot
                     {
                         FileName = JREPath,
                         Arguments = "-jar " + Directory.GetCurrentDirectory() + @"\Lavalink\Lavalink.jar",
+                        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
                     },
+                    EnableRaisingEvents = true,
                 };
-                Lavalink.Start();
-                
-                await TerminalUpdate("Lavalink started.");
                 Lavalink.Exited += Lavalink_Exited;
+                Lavalink.Start();
+                await TerminalUpdate("Lavalink process started.");
+                Lavalink.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(LavaLinkOutput);
             }
             else
             {
-                try
-                {
-                    Lavalink.Kill();
-                    await TerminalUpdate("Lavalink stopped.");
-                    Lavalink = null;
-                }
-                catch
-                {
-                    Lavalink = null;
-                    await TerminalUpdate("Lavalink was already stopped externally.");
-                }
+                Lavalink.Kill();
             }
+        }
+
+        async void LavaLinkOutput(object sendingProcess, System.Diagnostics.DataReceivedEventArgs outLine)
+        {
+            string processname = sendingProcess.GetType().Name;
+            await TerminalUpdate(processname + ": " + outLine.Data);
         }
         
         #endregion
