@@ -314,13 +314,7 @@ namespace InfinityBot
         public Brush ErrorBG = new BrushConverter().ConvertFrom("#E81123") as Brush;
 
         public Brush DefaultText = new BrushConverter().ConvertFrom("#FFFFFF") as Brush;
-        public Brush DefaultBG
-        {
-            get
-            {
-                return SystemParameters.WindowGlassBrush;
-            }
-        }
+        public Brush DefaultBG => SystemParameters.WindowGlassBrush;
 
 
 
