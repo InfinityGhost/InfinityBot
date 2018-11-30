@@ -22,6 +22,7 @@ using TextBox = System.Windows.Controls.TextBox;
 using DataGrid = System.Windows.Controls.DataGrid;
 using Discord.WebSocket;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace InfinityBot
 {
@@ -50,45 +51,10 @@ namespace InfinityBot
             {
                 await TerminalUpdate("Ready to start bot.");
             }
-            if (System.Diagnostics.Debugger.IsAttached)
+            if (Debugger.IsAttached)
                 Title += " - Debugging";
 
             await NotifyIconStartup();
-        }
-
-        private async void Lavalink_Exited(object sender, EventArgs e)
-        {
-            var process = sender as System.Diagnostics.Process;
-            var exitcode = process.ExitCode;
-            switch (exitcode)
-            {
-                case -1:
-                    {
-                        await TerminalUpdate("Lavalink process stopped.");
-                        break;
-                    }
-                case 1:
-                    {
-                        string output = "Lavalink process crashed!" + Environment.NewLine;
-                        string logfile = Directory.GetCurrentDirectory() + @"\Lavalink\logs\spring.log";
-                        List<string> lines = File.ReadAllLines(logfile).ToList();
-                        lines = lines.Skip(lines.ToArray().Length - 5).Take(5).ToList();
-                        lines.Insert(0, $"--- {Directory.GetCurrentDirectory()}\\Lavalink\\logs\\spring.log ---");
-                        lines.Add($"--- end of file ---");
-                        lines.ForEach(x => output += x + Environment.NewLine);
-                        await TerminalUpdate(output);
-                        await TerminalUpdate("Restarting lavalink process...");
-                        Lavalink = null;
-                        LavaLinkControl();
-                        return;
-                    }
-                default:
-                    {
-                        await TerminalUpdate("Lavalink process exited with code " + exitcode);
-                        break;
-                    }
-            }
-            Lavalink = null;
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -110,7 +76,7 @@ namespace InfinityBot
 
         private Lavalink.Lavalink_Config LavaLinkWindow = new Lavalink.Lavalink_Config();
         public string JREPath;
-        public System.Diagnostics.Process Lavalink;
+        public Process Lavalink;
 
         #endregion
 
@@ -253,7 +219,7 @@ namespace InfinityBot
         {
             try
             {
-                System.Diagnostics.Process.Start(logfile);
+                Process.Start(logfile);
             }
             catch
             {
@@ -613,20 +579,23 @@ namespace InfinityBot
         {
             if (Lavalink == null)
             {
-                Lavalink = new System.Diagnostics.Process
+                Lavalink = new Process
                 {
-                    StartInfo = new System.Diagnostics.ProcessStartInfo
+                    StartInfo = new ProcessStartInfo
                     {
                         FileName = JREPath,
                         Arguments = "-jar " + Directory.GetCurrentDirectory() + @"\Lavalink\Lavalink.jar",
-                        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                        UseShellExecute = true,
+                        CreateNoWindow = !Debugger.IsAttached,
                     },
                     EnableRaisingEvents = true,
+                    
                 };
+
                 Lavalink.Exited += Lavalink_Exited;
                 Lavalink.Start();
                 await TerminalUpdate("Lavalink process started.");
-                Lavalink.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(LavaLinkOutput);
+                Lavalink.OutputDataReceived += new DataReceivedEventHandler(LavaLinkOutput);
             }
             else
             {
@@ -634,12 +603,64 @@ namespace InfinityBot
             }
         }
 
-        async void LavaLinkOutput(object sendingProcess, System.Diagnostics.DataReceivedEventArgs outLine)
+        async void LavaLinkOutput(object sendingProcess, DataReceivedEventArgs outLine)
         {
             string processname = sendingProcess.GetType().Name;
             await TerminalUpdate(processname + ": " + outLine.Data);
         }
-        
+
+        private int crashCount = 0;
+
+        private async void Lavalink_Exited(object sender, EventArgs e)
+        {
+            var process = sender as Process;
+            var exitcode = process.ExitCode;
+            switch (exitcode)
+            {
+                case -1:
+                    {
+                        await TerminalUpdate("Lavalink process stopped.");
+                        break;
+                    }
+                case 1:
+                    {
+                        crashCount++;
+
+                        string output = "Lavalink process crashed!" + Environment.NewLine;                        
+                        string logfile = Directory.GetCurrentDirectory() + @"\Lavalink\logs\spring.log";
+
+                        List<string> lines = File.ReadAllLines(logfile).ToList();
+                        lines = lines.Skip(lines.ToArray().Length - 5).Take(5).ToList();
+                        lines.Insert(0, $"--- {Directory.GetCurrentDirectory()}\\Lavalink\\logs\\spring.log ---");
+                        lines.Add($"--- end of file ---");
+                        lines.ForEach(x => output += x + Environment.NewLine);
+                        await TerminalUpdate(output);
+
+                        if (crashCount < 3)
+                        {
+                            await TerminalUpdate("Restarting lavalink process...");
+                            Lavalink = null;
+                            await Task.Delay(2500);
+                            LavaLinkControl();
+                        }
+                        else
+                        {
+                            await TerminalUpdate("Please check spring.log for assistance with repeated crash.");
+                            Process.Start($"{Directory.GetCurrentDirectory()}\\Lavalink\\logs\\spring.log");
+                            crashCount = 0;
+                        }
+                        return;
+                    }
+                default:
+                    {
+                        await TerminalUpdate("Lavalink process exited with code " + exitcode);
+                        break;
+                    }
+            }
+            Lavalink = null;
+        }
+
+
         #endregion
 
     }

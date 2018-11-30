@@ -10,6 +10,8 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 
+using SharpLink;
+
 namespace InfinityBot
 {
     public class Bot
@@ -17,6 +19,7 @@ namespace InfinityBot
         public Bot(string token)
         {
             Token = token;
+            LavalinkManager = new LavalinkManager(Client);
         }
 
         #region Variables
@@ -33,6 +36,8 @@ namespace InfinityBot
 
         public SocketMessage ReplyMessage;
         public SocketChannel Channel;
+
+        LavalinkManager LavalinkManager;
 
         #endregion
 
@@ -61,6 +66,7 @@ namespace InfinityBot
             await InstallCommands();
             Output(this, "Username: " + Client.CurrentUser.Username);
             await Client.SetGameAsync(Information.AssemblyVersion);
+            await LavalinkManager.StartAsync();
         }
 
         #endregion
@@ -264,6 +270,12 @@ namespace InfinityBot
                 return false;
             }
         }
+
+        #endregion
+
+        #region Music
+
+        
 
         #endregion
     }
