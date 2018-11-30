@@ -636,10 +636,10 @@ namespace InfinityBot
                         lines.ForEach(x => output += x + Environment.NewLine);
                         await TerminalUpdate(output);
 
+                        Lavalink = null;
                         if (crashCount < 3)
                         {
                             await TerminalUpdate("Restarting lavalink process...");
-                            Lavalink = null;
                             await Task.Delay(2500);
                             LavaLinkControl();
                         }
