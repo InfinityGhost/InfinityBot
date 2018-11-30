@@ -241,7 +241,7 @@ namespace InfinityBot
                 await Log(ex.ToString());
             }
         }
-        void TerminalUpdate(string[] text) => Array.ForEach(text, async line => await TerminalUpdate(line));
+        void TerminalUpdate(IEnumerable<string> text) => text.ToList().ForEach(async line => await TerminalUpdate(line));
         async void TerminalUpdate(object sender, string e) => await TerminalUpdate(e);
 
         void TerminalClear() => Terminal.Text = string.Empty;
