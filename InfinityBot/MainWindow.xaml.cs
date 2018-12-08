@@ -85,21 +85,36 @@ namespace InfinityBot
                 }
                 catch(Exception ex)
                 {
-                    string[] output =
-                    {
-                        ex.Message,
-                        ex.ToString(),
-                        ex.InnerException.ToString(),
-                        ex.Data.ToString(),
-                    };
                     try
                     {
-                        TerminalUpdate(output);
+                        string[] output =
+                        {
+                            ex?.Message ?? null,
+                            ex?.ToString() ?? null,
+                            ex?.InnerException.ToString() ?? null,
+                            ex?.Data.ToString() ?? null,
+                        };
+                        try
+                        {
+                            TerminalUpdate(output);
+                        }
+                        catch
+                        {
+                            Log(output);
+                        }
                     }
                     catch
                     {
-                        Log(output);
+                        try
+                        {
+                            await TerminalUpdate(ex.ToString());
+                        }
+                        catch
+                        {
+                            await Log(ex.ToString());
+                        }
                     }
+                    
                 }
             }
             else
