@@ -117,5 +117,22 @@ namespace InfinityBot.Commands
                 await x.DeleteAsync();
             }   
         }
+
+        [Command("addrole"), Summary("Adds a new role to the current guild.")]
+        public async Task AddRole([Remainder, Summary("Arguments")] string stringArgs)
+        {
+            await Context.Message.DeleteAsync();
+            var args = stringArgs.Split(' ');
+            var name = args[0];
+            var colorString = args[1] ?? "000000";
+
+            var colorInt = Convert.ToUInt32(colorString, 16);
+            Color color = new Color(colorInt);
+
+            await Context.Guild.CreateRoleAsync(name, null, color);
+            var reply = await ReplyAsync($"Role \"{name}\" was created.");
+            await Task.Delay(delay);
+            reply.DeleteAsync();
+        }
     }
 }
