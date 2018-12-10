@@ -32,7 +32,7 @@ namespace InfinityBot.Commands
                 if (msgCount > 100)
                     msgCount = 100;
 
-                var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(msgCount + 1).FlattenAsync();
+                var msgCollection = await (channel as ISocketMessageChannel).GetMessagesAsync(msgCount).FlattenAsync();
                 if (msgCollection == null)
                 {
                     var errorMsg = await ReplyAsync("Error: No messages to delete.");
@@ -61,7 +61,7 @@ namespace InfinityBot.Commands
                     reply = $"Deleted {msgCollection.ToArray().Length} messages from {channel.Guild.Name}/#{channel.Name}.";
                 }
                 var replyMsg = await ReplyAsync(reply);
-                await Task.Delay(2000);
+                await Task.Delay(delay);
                 await replyMsg.DeleteAsync();
             }
             else
@@ -132,7 +132,7 @@ namespace InfinityBot.Commands
             await Context.Guild.CreateRoleAsync(name, null, color);
             var reply = await ReplyAsync($"Role \"{name}\" was created.");
             await Task.Delay(delay);
-            reply.DeleteAsync();
+            await reply.DeleteAsync();
         }
     }
 }
