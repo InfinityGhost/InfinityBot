@@ -40,6 +40,16 @@ namespace InfinityBot
             });
         }
 
+        public new void Clear()
+        {
+            base.Clear();
+            base.Add(new ComboBoxItem
+            {
+                Content = "- Reply in recent msg channel -",
+                Tag = "-1",
+            });
+        }
+
         #endregion
 
         #region Static Methods

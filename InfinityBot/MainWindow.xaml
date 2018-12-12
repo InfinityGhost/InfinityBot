@@ -15,8 +15,8 @@
         <Menu VerticalAlignment="Top" Background="White">
             <MenuItem Header="File">
                 <MenuItem Header="About..." Click="AboutShow"/>
-                <MenuItem Header="Save settings..." Click="SaveButton"/>
-                <MenuItem Header="Load settings..." Click="LoadButton"/>
+                <MenuItem Header="Save settings..." Click="SaveDialog"/>
+                <MenuItem Header="Load settings..." Click="LoadDialog"/>
                 <MenuItem Header="Save default settings" Click="SaveDefaultsButton"/>
                 <MenuItem Header="Exit" Click="ExitButton"/>
             </MenuItem>

@@ -39,7 +39,6 @@ namespace InfinityBot
 
         async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            await ClearChannels();
             try
             {
                 LoadDefault();
@@ -333,7 +332,7 @@ namespace InfinityBot
             return Task.CompletedTask;
         }
 
-        private async void SaveFile()
+        private async void SaveDialog(object sender = null, EventArgs e = null)
         {
             var dialog = new SaveFileDialog
             {
@@ -353,7 +352,7 @@ namespace InfinityBot
                 }
             }
         }
-        private async void LoadFile()
+        private async void LoadDialog(object sender = null, EventArgs e = null)
         {
             var dialog = new OpenFileDialog
             {
@@ -425,17 +424,13 @@ namespace InfinityBot
             await TerminalUpdate($"Text channel {channel.Guild.Name}/#{channel.Name} added.");
         }
 
+        private void ClearChannels(object sender = null, EventArgs e = null) => ChannelsList.Clear();
+
         #endregion
 
         #region Menu Buttons
 
-        private void AboutShow(object sender, RoutedEventArgs e)
-        {
-            var x = new AboutBox();
-            x.ShowDialog();
-        }
-        void SaveButton(object sender, RoutedEventArgs e) => SaveFile();
-        void LoadButton(object sender, RoutedEventArgs e) => LoadFile();
+        private void AboutShow(object sender = null, EventArgs e = null) => new AboutBox().ShowDialog();
         async void SaveDefaultsButton(object sender, RoutedEventArgs e)
         {
             await TerminalUpdate("Saved defaults.");
