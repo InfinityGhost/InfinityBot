@@ -13,14 +13,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Forms;
 using System.Threading;
 using System.Reflection;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Clipboard = System.Windows.Clipboard;
 using TextBox = System.Windows.Controls.TextBox;
-using DataGrid = System.Windows.Controls.DataGrid;
-using Discord.WebSocket;
 using System.Collections.ObjectModel;
 
 namespace InfinityBot
@@ -37,7 +34,7 @@ namespace InfinityBot
             InitializeComponent();
         }
 
-        async void Window_Loaded(object sender, RoutedEventArgs e)
+        async void Window_Loaded(object sender = null, EventArgs e = null)
         {
             try
             {
@@ -54,15 +51,17 @@ namespace InfinityBot
 
             ChannelsBox.ItemsSource = ChannelsList;
             ChannelDataGrid.ItemsSource = ChannelsList;
+            await TrayIcon.Initialize();
+            TrayIcon.ShowWindow += TrayIcon_ShowWindow;
 
-            await NotifyIconStartup();
         }
 
         private Bot bot;
-        private Assembly assembly = Assembly.GetExecutingAssembly();
+        private TrayIcon TrayIcon = new TrayIcon();
 
         readonly string SettingsVersion = "0.1.1";
         string TimePrefix => DateTime.Now.ToLocalTime() + ": ";
+
         readonly string logFile = Directory.GetCurrentDirectory() + @"\" + "log.log";
         readonly string channelsFile = Directory.GetCurrentDirectory() + @"\" + "channels.txt";
         readonly string defaultsFile = Directory.GetCurrentDirectory() + @"\" + "defaults.cfg";
@@ -71,7 +70,7 @@ namespace InfinityBot
 
         #region Main Bot Controls
 
-        async void StartBot(object sender, RoutedEventArgs e)
+        async void StartBot(object sender = null, EventArgs e = null)
         {
             if ((string)StartButton.Content == "Start Bot")
             {
@@ -217,9 +216,9 @@ namespace InfinityBot
         void TerminalClear() => Terminal.Text = string.Empty;
 
         // Context Menu
-        void TerminalClear(object sender, RoutedEventArgs e) => TerminalClear();
-        void TerminalCopy(object sender, RoutedEventArgs e) => Clipboard.SetText(Terminal.Text);
-        async void OpenLogButton(object sender, RoutedEventArgs e)
+        void TerminalClear(object sender = null, EventArgs e = null) => TerminalClear();
+        void TerminalCopy(object sender = null, EventArgs e = null) => Clipboard.SetText(Terminal.Text);
+        async void OpenLogButton(object sender = null, EventArgs e = null)
         {
             try
             {
@@ -334,7 +333,7 @@ namespace InfinityBot
 
         private async void SaveDialog(object sender = null, EventArgs e = null)
         {
-            var dialog = new SaveFileDialog
+            var dialog = new System.Windows.Forms.SaveFileDialog
             {
                 Filter = "Bot configuration files (*.cfg)|*.cfg|All files (*.*)|*.*",
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
@@ -354,7 +353,7 @@ namespace InfinityBot
         }
         private async void LoadDialog(object sender = null, EventArgs e = null)
         {
-            var dialog = new OpenFileDialog
+            var dialog = new System.Windows.Forms.OpenFileDialog
             {
                 Filter = "Bot configuration files (*.cfg)|*.cfg|All files (*.*)|*.*",
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
@@ -373,7 +372,7 @@ namespace InfinityBot
             }
         }
 
-        private async void SaveDefault() => await Save(defaultsFile);
+        private async void SaveDefaults() => await Save(defaultsFile);
         private async void LoadDefault() => await Load(defaultsFile);
 
         // Channels
@@ -431,33 +430,22 @@ namespace InfinityBot
         #region Menu Buttons
 
         private void AboutShow(object sender = null, EventArgs e = null) => new AboutBox().ShowDialog();
-        async void SaveDefaultsButton(object sender, RoutedEventArgs e)
+        async void SaveDefaultsButton(object sender = null, EventArgs e = null)
         {
+            SaveDefaults();
             await TerminalUpdate("Saved defaults.");
-            SaveDefault();
         }
-        void ExitButton(object sender, RoutedEventArgs e) => Close();
+        void ExitButton(object sender = null, EventArgs e = null) => Close();
 
         #endregion
 
-        #region Tray / Notification icon
+        #region Misc.
 
-        NotifyIcon NotifyIcon = new NotifyIcon();
-
-        private Task NotifyIconStartup()
+        private async void GetInvite(object sender = null, EventArgs e = null)
         {
-            string icon = @"InfinityBot.infinitybot.ico";
-            NotifyIcon.Icon = new System.Drawing.Icon(assembly.GetManifestResourceStream(icon));
-            NotifyIcon.MouseClick += NotifyIcon_Click;
-            NotifyIcon.Text = "InfinityBot";
-
-            return Task.CompletedTask;
-        }
-
-        private void NotifyIcon_Click(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            Show();
-            WindowState = WindowState.Normal;
+            string link = "https://discordapp.com/oauth2/authorize?client_id=" + ClientID.Password + @"&scope=bot";
+            Clipboard.SetText(link);
+            await TerminalUpdate("Copied link to clipboard: " + link);
         }
 
         private void Window_StateChanged(object sender, EventArgs e)
@@ -467,28 +455,22 @@ namespace InfinityBot
                 case WindowState.Minimized:
                     {
                         ShowInTaskbar = false;
-                        NotifyIcon.Visible = true;
+                        TrayIcon.Visible = true;
                         Hide();
                         break;
                     }
                 case WindowState.Normal:
                     {
                         ShowInTaskbar = true;
-                        NotifyIcon.Visible = false;
+                        TrayIcon.Visible = false;
                         break;
                     }
             }
         }
 
-        #endregion
-
-        #region Misc.
-
-        private async void GetInvite(object sender, RoutedEventArgs e)
+        private void TrayIcon_ShowWindow(object sender, EventArgs e)
         {
-            string x = "https://discordapp.com/oauth2/authorize?client_id=" + ClientID.Password + @"&scope=bot";
-            Clipboard.SetText(x);
-            await TerminalUpdate("Copied link to clipboard: " + x);
+            Show();
         }
 
         #endregion

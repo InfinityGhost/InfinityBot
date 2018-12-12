@@ -227,6 +227,7 @@
     </Compile>
     <Compile Include="Channels.cs" />
     <Compile Include="Information.cs" />
+    <Compile Include="TrayIcon.cs" />
     <Compile Include="Tools\TypeConverter.cs" />
     <Page Include="AboutBox.xaml">
       <SubType>Designer</SubType>
