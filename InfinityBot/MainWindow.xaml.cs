@@ -43,7 +43,7 @@ namespace InfinityBot
             try
             {
                 LoadDefault();
-                await LoadChannels();
+                LoadChannels();
                 await TerminalUpdate("Ready to start bot. Default settings loaded.");
             }
             catch
@@ -53,7 +53,8 @@ namespace InfinityBot
             if (System.Diagnostics.Debugger.IsAttached)
                 Title += " - Debugging";
 
-            
+            ChannelsBox.ItemsSource = ChannelsList;
+            ChannelDataGrid.ItemsSource = ChannelsList;
 
             await NotifyIconStartup();
         }
@@ -63,7 +64,9 @@ namespace InfinityBot
 
         readonly string SettingsVersion = "0.1.1";
         string TimePrefix => DateTime.Now.ToLocalTime() + ": ";
-        readonly string logfile = Directory.GetCurrentDirectory() + @"\" + "log.log";
+        readonly string logFile = Directory.GetCurrentDirectory() + @"\" + "log.log";
+        readonly string channelsFile = Directory.GetCurrentDirectory() + @"\" + "channels.txt";
+        readonly string defaultsFile = Directory.GetCurrentDirectory() + @"\" + "defaults.cfg";
 
         #endregion
 
@@ -221,7 +224,7 @@ namespace InfinityBot
         {
             try
             {
-                System.Diagnostics.Process.Start(logfile);
+                System.Diagnostics.Process.Start(logFile);
             }
             catch
             {
@@ -234,7 +237,7 @@ namespace InfinityBot
         {
             try
             {
-                File.AppendAllText(logfile, Environment.NewLine + TimePrefix + text);
+                File.AppendAllText(logFile, Environment.NewLine + TimePrefix + text);
             }
             catch (Exception ex)
             {
@@ -283,14 +286,12 @@ namespace InfinityBot
 
         public Brush DefaultText = new BrushConverter().ConvertFrom("#FFFFFF") as Brush;
         public Brush DefaultBG => SystemParameters.WindowGlassBrush;
-
-
-
+        
         #endregion
 
         #region Settings Management
 
-        Task Save(string path)
+        private Task Save(string path)
         {
             File.WriteAllLines(path, new string[]
             {
@@ -301,7 +302,7 @@ namespace InfinityBot
             });
             return Task.CompletedTask;
         }
-        Task Load(string path)
+        private Task Load(string path)
         {
             var x = File.ReadAllLines(path);
             if (x[0] == "ver:" + SettingsVersion)
@@ -332,7 +333,7 @@ namespace InfinityBot
             return Task.CompletedTask;
         }
 
-        async void SaveFile()
+        private async void SaveFile()
         {
             var dialog = new SaveFileDialog
             {
@@ -352,7 +353,7 @@ namespace InfinityBot
                 }
             }
         }
-        async void LoadFile()
+        private async void LoadFile()
         {
             var dialog = new OpenFileDialog
             {
@@ -373,13 +374,12 @@ namespace InfinityBot
             }
         }
 
-        async void SaveDefault() => await Save(Directory.GetCurrentDirectory() + @"\" + "defaults.cfg");
-        async void LoadDefault() => await Load(Directory.GetCurrentDirectory() + @"\" + "defaults.cfg");
+        private async void SaveDefault() => await Save(defaultsFile);
+        private async void LoadDefault() => await Load(defaultsFile);
 
         // Channels
 
-        async void SaveChannels(object sender, RoutedEventArgs e) => await SaveChannels();
-        async Task SaveChannels()
+        async void SaveChannels(object sender = null, EventArgs e = null)
         {
             try
             {
@@ -393,60 +393,18 @@ namespace InfinityBot
             }
         }
 
-        async void LoadChannels(object sender, RoutedEventArgs e) => await LoadChannels();
-        Task LoadChannels()
+        private void LoadChannels(object sender = null, EventArgs e = null)
         {
-            ClearChannels();
-            try
-            {
-                List<string> fileContents = File.ReadAllLines(Directory.GetCurrentDirectory() + @"\" + "channels.txt").ToList();
-                fileContents.ForEach(item =>
-                {
-                    if (item != string.Empty)
-                    {
-                        var x = item.Split(',');
-                        AddChannel(x[0], x[1]);
-                    }
-                });
-                ChannelsBox.ItemsSource = ChannelsList;
-                ChannelDataGrid.ItemsSource = ChannelsList;
-                ChannelsBox.SelectedIndex = 0;
-                
-            }
-            catch { }
-            return Task.CompletedTask;
+            ChannelsList.Clear();
+            ChannelsList.AddFile(channelsFile);
+            ChannelsBox.SelectedIndex = 0;
         }
 
         #endregion
 
         #region Channel Management
 
-        List<ComboBoxItem> ChannelsList = new List<ComboBoxItem>();
-
-        async void AddChannel(string name, ulong id) => await AddChannel(name, id.ToString());
-        Task AddChannel(string name, string id)
-        {
-            ChannelsList.Add(new ComboBoxItem
-            {
-                Content = name,
-                Tag = id,
-            });
-            return Task.CompletedTask;
-        }
-
-        async void ClearChannels(object sender, RoutedEventArgs e) => await ClearChannels();
-        Task ClearChannels()
-        {
-            ChannelsList = new List<ComboBoxItem>
-            {
-                new ComboBoxItem
-                {
-                    Content = "- Reply in recent msg channel -",
-                    Tag = "-1",
-                },
-            };
-            return Task.CompletedTask;
-        }
+        Channels ChannelsList = new Channels();
 
         private void GetChannels(object sender, ulong e)
         {
@@ -454,17 +412,17 @@ namespace InfinityBot
             channels.ForEach(item =>
             {
                 if (item != null)
-                    AddChannel(item.Guild.Name + "/#" + item.Name, item.Id);
+                    ChannelsList.Add(item.Guild.Name + "/#" + item.Name, item.Id);
             });
         }
 
-        async void AddChannelRequested(object sender, ulong e)
+        async void AddChannelUID(object sender, ulong e)
         {
             var channel = bot.GetChannel(e);
-            var guild = channel.Guild;
-            AddChannel(guild.Name + "/#" + channel.Name, channel.Id);
-            await TerminalUpdate($"Text channel {guild.Name}/#{channel.Name} added.");
+            ChannelsList.Add(channel);
             ChannelsBox.SelectedIndex = ChannelsList.Count - 1;
+
+            await TerminalUpdate($"Text channel {channel.Guild.Name}/#{channel.Name} added.");
         }
 
         #endregion
