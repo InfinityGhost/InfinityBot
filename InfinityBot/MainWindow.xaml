@@ -49,7 +49,7 @@
                         </Grid>
                     </GroupBox>
                     <Grid VerticalAlignment="Bottom" Height="44" Margin="10,0,10,0">
-                        <ComboBox x:Name="Channels" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200"/>
+                        <ComboBox x:Name="ChannelsBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200"/>
                         <Button x:Name="StartButton" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Start Bot" Height="24" Width="100" Click="StartBot" IsTabStop="False"/>
                     </Grid>
                 </Grid>
@@ -103,8 +103,8 @@
                     <GroupBox Header="Channels" Margin="5">
                         <DataGrid x:Name="ChannelDataGrid" Background="{x:Null}" Margin="2.5" AutoGenerateColumns="False" CanUserResizeRows="False" RowHeaderWidth="0">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Channel Name" Binding="{Binding Content}" Width="200" CanUserResize="False"/>
-                                <DataGridTextColumn x:Name="IDColumn" Header="Channel ID" Binding="{Binding Tag}"/>
+                                <DataGridTextColumn Header="Channel Name" Binding="{Binding Content, Mode=TwoWay}" Width="200" CanUserResize="False"/>
+                                <DataGridTextColumn x:Name="IDColumn" Header="Channel ID" Binding="{Binding Tag, Mode=TwoWay}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </GroupBox>

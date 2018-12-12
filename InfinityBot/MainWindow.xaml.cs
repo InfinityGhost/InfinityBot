@@ -53,6 +53,8 @@ namespace InfinityBot
             if (System.Diagnostics.Debugger.IsAttached)
                 Title += " - Debugging";
 
+            
+
             await NotifyIconStartup();
         }
 
@@ -143,8 +145,8 @@ namespace InfinityBot
                 {
                     try
                     {
-                        var selectedItem = Channels.SelectedItem as ComboBoxItem;
-                        if (selectedItem.Tag.ToString() == "-1")
+                        var selectedItem = ChannelsBox.SelectedItem as ComboBoxItem;
+                        if ((string)selectedItem.Tag == "-1")
                         {
                             try
                             {
@@ -280,13 +282,7 @@ namespace InfinityBot
         public Brush ErrorBG = new BrushConverter().ConvertFrom("#E81123") as Brush;
 
         public Brush DefaultText = new BrushConverter().ConvertFrom("#FFFFFF") as Brush;
-        public Brush DefaultBG
-        {
-            get
-            {
-                return SystemParameters.WindowGlassBrush;
-            }
-        }
+        public Brush DefaultBG => SystemParameters.WindowGlassBrush;
 
 
 
@@ -385,14 +381,9 @@ namespace InfinityBot
         async void SaveChannels(object sender, RoutedEventArgs e) => await SaveChannels();
         async Task SaveChannels()
         {
-            string[] fileContents = { };
             try
             {
-                for (int i = 0; i < channelItems.Length - 1; i++)
-                {
-                    Array.Resize(ref fileContents, fileContents.Length + 1);
-                    fileContents[fileContents.Length - 1] = channelItems[i + 1].Content.ToString() + ',' + channelItems[i + 1].Tag.ToString();
-                }
+                List<string> fileContents = ChannelsList.Skip(1).ToList().ConvertAll(item => $"{item.Content},{item.Tag}");
                 File.WriteAllLines(Directory.GetCurrentDirectory() + @"\" + "channels.txt", fileContents);
                 await TerminalUpdate("Saved all channels.");
             }
@@ -406,10 +397,10 @@ namespace InfinityBot
         Task LoadChannels()
         {
             ClearChannels();
-            string[] fileContents = File.ReadAllLines(Directory.GetCurrentDirectory() + @"\" + "channels.txt");
             try
             {
-                Array.ForEach(fileContents, item =>
+                List<string> fileContents = File.ReadAllLines(Directory.GetCurrentDirectory() + @"\" + "channels.txt").ToList();
+                fileContents.ForEach(item =>
                 {
                     if (item != string.Empty)
                     {
@@ -417,6 +408,10 @@ namespace InfinityBot
                         AddChannel(x[0], x[1]);
                     }
                 });
+                ChannelsBox.ItemsSource = ChannelsList;
+                ChannelDataGrid.ItemsSource = ChannelsList;
+                ChannelsBox.SelectedIndex = 0;
+                
             }
             catch { }
             return Task.CompletedTask;
@@ -426,44 +421,23 @@ namespace InfinityBot
 
         #region Channel Management
 
-        ComboBoxItem[] channelItems = { };
-
-        ObservableCollection<ComboBoxItem> channelsCollection = new ObservableCollection<ComboBoxItem>();
-
-        Task UpdateChannelItems()
-        {
-            Channels.Items.Clear();
-            Array.ForEach(channelItems, item => Channels.Items.Add(item));
-            Channels.SelectedIndex = 0;
-
-            // ChannelDataGrid
-            channelsCollection = new ObservableCollection<ComboBoxItem>();
-            for (int i = 1; i < channelItems.Length; i++)
-            {
-                channelsCollection.Add(channelItems[i]);
-            }
-
-            ChannelDataGrid.ItemsSource = channelsCollection;
-            return Task.CompletedTask;
-        }
+        List<ComboBoxItem> ChannelsList = new List<ComboBoxItem>();
 
         async void AddChannel(string name, ulong id) => await AddChannel(name, id.ToString());
         Task AddChannel(string name, string id)
         {
-            Array.Resize(ref channelItems, channelItems.Length + 1);
-            channelItems[channelItems.Length - 1] = new ComboBoxItem
+            ChannelsList.Add(new ComboBoxItem
             {
                 Content = name,
                 Tag = id,
-            };
-            UpdateChannelItems();
+            });
             return Task.CompletedTask;
         }
 
         async void ClearChannels(object sender, RoutedEventArgs e) => await ClearChannels();
         Task ClearChannels()
         {
-            ComboBoxItem[] x =
+            ChannelsList = new List<ComboBoxItem>
             {
                 new ComboBoxItem
                 {
@@ -471,21 +445,16 @@ namespace InfinityBot
                     Tag = "-1",
                 },
             };
-            channelItems = x;
-            UpdateChannelItems();
             return Task.CompletedTask;
         }
 
         private void GetChannels(object sender, ulong e)
         {
-            var x = bot.GetChannels(e);
-            var guild = x[0].Guild;
-            Array.ForEach(x, item =>
+            var channels = bot.GetChannels(e).ToList();
+            channels.ForEach(item =>
             {
                 if (item != null)
-                {
                     AddChannel(item.Guild.Name + "/#" + item.Name, item.Id);
-                }
             });
         }
 
@@ -495,7 +464,7 @@ namespace InfinityBot
             var guild = channel.Guild;
             AddChannel(guild.Name + "/#" + channel.Name, channel.Id);
             await TerminalUpdate($"Text channel {guild.Name}/#{channel.Name} added.");
-            Channels.SelectedIndex = channelItems.Length - 1;
+            ChannelsBox.SelectedIndex = ChannelsList.Count - 1;
         }
 
         #endregion
