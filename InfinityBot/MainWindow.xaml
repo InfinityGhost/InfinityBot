@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InfinityBot"
+        xmlns:control="clr-namespace:InfinityBot.Controls"
         mc:Ignorable="d"
         Title="InfinityBot" Height="500" Width="800" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
@@ -31,25 +32,11 @@
             <TabItem Header="Main">
                 <Grid>
                     <GroupBox Header="Terminal" Margin="5,5,5,44">
-                        <Grid>
-                            <ScrollViewer Margin="0,0,0,18" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
-                                <TextBlock x:Name="Terminal" Foreground="White" Background="Black" FontFamily="Lucida Console" Padding="2,2,2,2">
-                                    <TextBlock.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="Clear Terminal" Click="TerminalClear"/>
-                                            <MenuItem Header="Copy all"/>
-                                            <MenuItem Header="Log all to text file" IsCheckable="True" x:Name="LogFile"/>
-                                            <MenuItem Header="Open log" Click="OpenLogButton"/>
-                                        </ContextMenu>
-                                    </TextBlock.ContextMenu>
-                                </TextBlock>
-                            </ScrollViewer>
-                            <TextBox x:Name="Command" VerticalAlignment="Bottom" KeyDown="TerminalCommand" Background="Black" Foreground="White"/>
-                            <Border BorderBrush="Black" IsHitTestVisible="False" VerticalAlignment="Bottom" Height="18" BorderThickness="1,0,1,1"/>
-                        </Grid>
+                        <control:Console x:Name="Console"
+                                         Status="StatusUpdate" Message="Message" BoxKey="MessageBoxKey"/>
                     </GroupBox>
                     <Grid VerticalAlignment="Bottom" Height="44" Margin="10,0,10,0">
-                        <ComboBox x:Name="ChannelsBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200"/>
+                        <ComboBox x:Name="ChannelsBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" IsTabStop="False"/>
                         <Button x:Name="StartButton" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Start Bot" Height="24" Width="100" Click="StartBot" IsTabStop="False"/>
                     </Grid>
                 </Grid>

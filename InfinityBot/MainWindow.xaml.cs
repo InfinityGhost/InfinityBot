@@ -40,11 +40,11 @@ namespace InfinityBot
             {
                 LoadDefault();
                 LoadChannels();
-                await TerminalUpdate("Ready to start bot. Default settings loaded.");
+                await Console.Log("Ready to start bot. Default settings loaded.");
             }
             catch
             {
-                await TerminalUpdate("Ready to start bot.");
+                await Console.Log("Ready to start bot.");
             }
             if (System.Diagnostics.Debugger.IsAttached)
                 Title += " - Debugging";
@@ -60,8 +60,6 @@ namespace InfinityBot
         private TrayIcon TrayIcon = new TrayIcon();
 
         readonly string SettingsVersion = "0.1.1";
-        string TimePrefix => DateTime.Now.ToLocalTime() + ": ";
-
         readonly string logFile = Directory.GetCurrentDirectory() + @"\" + "log.log";
         readonly string channelsFile = Directory.GetCurrentDirectory() + @"\" + "channels.txt";
         readonly string defaultsFile = Directory.GetCurrentDirectory() + @"\" + "defaults.cfg";
@@ -79,7 +77,7 @@ namespace InfinityBot
 
                 // Event handlers
                 {
-                    bot.Output += TerminalUpdate;
+                    bot.Output += Console.Log;
                 }
 
                 try
@@ -88,7 +86,7 @@ namespace InfinityBot
                 }
                 catch(Exception ex)
                 {
-                    await TerminalUpdate(ex.ToString());
+                    await Console.Log(ex.ToString());
                 }
             }
             else
@@ -101,154 +99,62 @@ namespace InfinityBot
 
         #endregion
 
-        #region Terminal & StatusBar
+        #region Console and Status
 
-        // Terminal
-        async void TerminalCommand(object sender, KeyEventArgs e)
+        private async void Message(object sender, string message = null)
         {
-            if (e.Key == Key.Enter)
+            if (message != null)
             {
-                if (bot == null)
+                string id = (string)(ChannelsBox.SelectedItem as ComboBoxItem).Tag;
+                if (id == "-1")
+                    await bot.ReplyToMessage(message);
+                else
+                    await bot.ServerMessage(message, bot.GetChannel(Convert.ToUInt64(id)));
+            }
+        }
+
+        private async void MessageBoxKey(object sender, Key key)
+        {
+            await Dispatcher.BeginInvoke(new Action(() =>
+            {
+                var index = ChannelsBox.SelectedIndex;
+                switch (key)
                 {
-                    await TerminalUpdate("Error: Bot must be running in order to send messages or commands.");
-                    return;
+                    case Key.Down:
+                        if (index++ != ChannelsList.Count)
+                            ChannelsBox.SelectedIndex++;
+                        break;
+                    case Key.Up:
+                        if (index-- != 0)
+                            ChannelsBox.SelectedIndex--;
+                        break;
                 }
-                if ((sender as TextBox).Text != string.Empty)
-                {
-                    try
-                    {
-                        var selectedItem = ChannelsBox.SelectedItem as ComboBoxItem;
-                        if ((string)selectedItem.Tag == "-1")
-                        {
-                            try
-                            {
-                                await bot.ReplyToMessage((sender as TextBox).Text);
-                            }
-                            catch (Exception ex)
-                            {
-                                await TerminalUpdate(ex.ToString());
-                            }
-                        }
-                        else
-                        {
-                            try
-                            {
-                                await bot.MessageDirect((sender as TextBox).Text, Convert.ToUInt64(selectedItem.Tag));
-                            }
-                            catch (Discord.Net.HttpException)
-                            {
-                                await TerminalUpdate("Error: Unable to send message due to lack of permissions.");
-                            }
-                            catch (Exception ex)
-                            {
-                                await TerminalUpdate(ex.ToString());
-                            }
-                        }
-                        (sender as TextBox).Text = string.Empty;
-                    }
-                    catch (Discord.Net.HttpException)
-                    {
-                        await TerminalUpdate("Error: Failed to send due to lack of permissions.");
-                    }
-                }
-            }
+            }));
         }
 
-        async Task TerminalUpdate(string text)
+        private async void StatusUpdate(object sender, string text)
         {
-            try
+            await Dispatcher.BeginInvoke(new Action(() =>
             {
-                await Dispatcher.BeginInvoke(new Action(async () =>
-                {
-                    if (Terminal.Text == string.Empty)
-                    {
-                        Terminal.Text += TimePrefix + text;
-                    }
-                    else
-                    {
-                        Terminal.Text += Environment.NewLine + TimePrefix + text;
-                    }
-                    await StatusUpdate(text);
-
-                    if (LogFile.IsChecked == true)
-                    {
-                        await Log(text);
-                    }
-                }));
-            }
-            catch (Exception ex)
-            {
-                await Log(ex.ToString());
-            }
-        }
-        void TerminalUpdate(string[] text) => Array.ForEach(text, async line => await TerminalUpdate(line));
-        async void TerminalUpdate(object sender, string e) => await TerminalUpdate(e);
-
-        void TerminalClear() => Terminal.Text = string.Empty;
-
-        // Context Menu
-        void TerminalClear(object sender = null, EventArgs e = null) => TerminalClear();
-        void TerminalCopy(object sender = null, EventArgs e = null) => Clipboard.SetText(Terminal.Text);
-        async void OpenLogButton(object sender = null, EventArgs e = null)
-        {
-            try
-            {
-                System.Diagnostics.Process.Start(logFile);
-            }
-            catch
-            {
-                await TerminalUpdate("Error: No log file to open.");
-            }
-        }
-
-        // Logging
-        async Task Log(string text)
-        {
-            try
-            {
-                File.AppendAllText(logFile, Environment.NewLine + TimePrefix + text);
-            }
-            catch (Exception ex)
-            {
-                await StatusUpdate("Error: Failed to update log! " + ex.ToString());
-            }
-        }
-        void Log(string[] text) => Array.ForEach(text, async line => await Log(line));
-
-        // Status
-        async Task StatusUpdate(string text)
-        {
-            if (text != null)
-            {
-                await Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    Status.Text = text.Replace(TimePrefix, string.Empty);
-                }));
-            }
-            if (text.Contains("Error") || text.Contains("Exception"))
-            {
-                await Dispatcher.BeginInvoke(new Action(() =>
+                Status.Text = text;
+                if (text.Contains("Error") || text.Contains("Exception"))
                 {
                     if (StatusBar.Background == DefaultBG)
                     {
                         StatusBar.Background = ErrorBG;
                         Status.Foreground = ErrorText;
                     }
-                }));
-            }
-            else
-            {
-                await Dispatcher.BeginInvoke(new Action(() =>
+                }
+                else
                 {
                     if (StatusBar.Background != DefaultBG)
                     {
                         StatusBar.Background = DefaultBG;
                         Status.Foreground = DefaultText;
                     }
-                }));
-            }
+                }
+            }));            
         }
-        void StatusClear() => Status.Text = string.Empty;
 
         public Brush ErrorText = new BrushConverter().ConvertFrom("#FFFFFF") as Brush;
         public Brush ErrorBG = new BrushConverter().ConvertFrom("#E81123") as Brush;
@@ -267,7 +173,7 @@ namespace InfinityBot
                 "ver:" + SettingsVersion,
                 "apiToken:" + APIToken.Password,
                 "clientID:" + ClientID.Password,
-                "logToFile:" + LogFile.IsChecked,
+                "logToFile:" + Console.LoggingEnabled,
             });
             return Task.CompletedTask;
         }
@@ -278,7 +184,7 @@ namespace InfinityBot
             {
                 APIToken.Password = x[1].Replace("apiToken:", string.Empty);
                 ClientID.Password = x[2].Replace("clientID:", string.Empty);
-                LogFile.IsChecked = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
+                Console.LoggingEnabled = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
             }
             else
             {
@@ -294,7 +200,7 @@ namespace InfinityBot
                         {
                             APIToken.Password = x[1].Replace("apiToken:", string.Empty);
                             ClientID.Password = x[2].Replace("clientID:", string.Empty);
-                            LogFile.IsChecked = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
+                            Console.LoggingEnabled = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
                             break;
                         }
                 }
@@ -318,7 +224,7 @@ namespace InfinityBot
                 }
                 catch
                 {
-                    await TerminalUpdate("Error: An error has occured while saving a setup file.");
+                    await Console.Log("Error: An error has occured while saving a setup file.");
                 }
             }
         }
@@ -338,7 +244,7 @@ namespace InfinityBot
                 }
                 catch
                 {
-                    await TerminalUpdate("Error: An error has occured while loading a setup file.");
+                    await Console.Log("Error: An error has occured while loading a setup file.");
                 }
             }
         }
@@ -354,11 +260,11 @@ namespace InfinityBot
             {
                 List<string> fileContents = ChannelsList.Skip(1).ToList().ConvertAll(item => $"{item.Content},{item.Tag}");
                 File.WriteAllLines(Directory.GetCurrentDirectory() + @"\" + "channels.txt", fileContents);
-                await TerminalUpdate("Saved all channels.");
+                await Console.Log("Saved all channels.");
             }
             catch (Exception ex)
             {
-                await TerminalUpdate("Failed to save channels to file." + Environment.NewLine + ex.ToString());
+                await Console.Log("Failed to save channels to file." + Environment.NewLine + ex.ToString());
             }
         }
 
@@ -391,7 +297,7 @@ namespace InfinityBot
             ChannelsList.Add(channel);
             ChannelsBox.SelectedIndex = ChannelsList.Count - 1;
 
-            await TerminalUpdate($"Text channel {channel.Guild.Name}/#{channel.Name} added.");
+            await Console.Log($"Text channel {channel.Guild.Name}/#{channel.Name} added.");
         }
 
         private void ClearChannels(object sender = null, EventArgs e = null) => ChannelsList.Clear();
@@ -404,7 +310,7 @@ namespace InfinityBot
         async void SaveDefaultsButton(object sender = null, EventArgs e = null)
         {
             SaveDefaults();
-            await TerminalUpdate("Saved defaults.");
+            await Console.Log("Saved defaults.");
         }
         void ExitButton(object sender = null, EventArgs e = null) => Close();
 
@@ -416,7 +322,7 @@ namespace InfinityBot
         {
             string link = "https://discordapp.com/oauth2/authorize?client_id=" + ClientID.Password + @"&scope=bot";
             Clipboard.SetText(link);
-            await TerminalUpdate("Copied link to clipboard: " + link);
+            await Console.Log("Copied link to clipboard: " + link);
         }
 
         private void Window_StateChanged(object sender, EventArgs e)
