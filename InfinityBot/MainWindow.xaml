@@ -25,7 +25,7 @@
 
         <!--TabControl-->
 
-        <TabControl Margin="0,18">
+        <TabControl x:Name="TabCtrl" Margin="0,18">
 
             <!--Main Tab-->
 
@@ -68,10 +68,10 @@
                 <Grid>
                     <StackPanel>
                         <GroupBox Header="APIToken">
-                            <PasswordBox x:Name="APIToken"/>
+                            <TextBox Text="{Binding APIToken, Mode=TwoWay}"/>
                         </GroupBox>
                         <GroupBox Header="ClientID">
-                            <PasswordBox x:Name="ClientID"/>
+                            <TextBox Text="{Binding ClientID, Mode=TwoWay}"/>
                         </GroupBox>
                         <Button Content="Get invite link" Click="GetInvite"/>
                     </StackPanel>

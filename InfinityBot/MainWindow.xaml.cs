@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 using System.Threading;
 using System.Reflection;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using Clipboard = System.Windows.Clipboard;
+using Clipboard = System.Windows.Clipboard; 
 using TextBox = System.Windows.Controls.TextBox;
 using System.Collections.ObjectModel;
 
@@ -40,6 +40,7 @@ namespace InfinityBot
             {
                 ChannelsBox.ItemsSource = ChannelsList;
                 ChannelDataGrid.ItemsSource = ChannelsList;
+                TabCtrl.DataContext = Settings;
             }
 
             try
@@ -62,6 +63,8 @@ namespace InfinityBot
         private Bot bot;
         private TrayIcon TrayIcon = new TrayIcon();
 
+        private Settings Settings = new Settings();
+
         readonly string SettingsVersion = "0.1.1";
         readonly string logFile = Directory.GetCurrentDirectory() + @"\" + "log.log";
         readonly string channelsFile = Directory.GetCurrentDirectory() + @"\" + "channels.txt";
@@ -76,7 +79,7 @@ namespace InfinityBot
             if ((string)StartButton.Content == "Start Bot")
             {
                 StartButton.Content = "Stop Bot";
-                bot = new Bot(APIToken.Password);
+                bot = new Bot(Settings.APIToken);
 
                 // Event handlers
                 {
@@ -169,48 +172,6 @@ namespace InfinityBot
 
         #region Settings Management
 
-        private Task Save(string path)
-        {
-            File.WriteAllLines(path, new string[]
-            {
-                "ver:" + SettingsVersion,
-                "apiToken:" + APIToken.Password,
-                "clientID:" + ClientID.Password,
-                "logToFile:" + Console.LoggingEnabled,
-            });
-            return Task.CompletedTask;
-        }
-        private Task Load(string path)
-        {
-            var x = File.ReadAllLines(path);
-            if (x[0] == "ver:" + SettingsVersion)
-            {
-                APIToken.Password = x[1].Replace("apiToken:", string.Empty);
-                ClientID.Password = x[2].Replace("clientID:", string.Empty);
-                Console.LoggingEnabled = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
-            }
-            else
-            {
-                switch (x[0])
-                {
-                    case "ver:0.1":
-                        {
-                            APIToken.Password = x[1].Replace("apiToken:", string.Empty);
-                            ClientID.Password = x[2].Replace("clientID:", string.Empty);
-                            break;
-                        }
-                    case "ver:0.1.1":
-                        {
-                            APIToken.Password = x[1].Replace("apiToken:", string.Empty);
-                            ClientID.Password = x[2].Replace("clientID:", string.Empty);
-                            Console.LoggingEnabled = Convert.ToBoolean(x[3].Replace("logToFile:", string.Empty));
-                            break;
-                        }
-                }
-            }
-            return Task.CompletedTask;
-        }
-
         private async void SaveDialog(object sender = null, EventArgs e = null)
         {
             var dialog = new System.Windows.Forms.SaveFileDialog
@@ -223,7 +184,7 @@ namespace InfinityBot
             {
                 try
                 {
-                    await Save(dialog.FileName);
+                    await Settings.Save(dialog.FileName);
                 }
                 catch
                 {
@@ -243,7 +204,7 @@ namespace InfinityBot
             {
                 try
                 {
-                    await Load(dialog.FileName);
+                    await Settings.Load(dialog.FileName);
                 }
                 catch
                 {
@@ -252,8 +213,8 @@ namespace InfinityBot
             }
         }
 
-        private async void SaveDefaults() => await Save(defaultsFile);
-        private async void LoadDefault() => await Load(defaultsFile);
+        private async void SaveDefaults() => await Settings.Save(defaultsFile);
+        private async void LoadDefault() => await Settings.Load(defaultsFile);
 
         // Channels
 
@@ -324,7 +285,7 @@ namespace InfinityBot
 
         private async void GetInvite(object sender = null, EventArgs e = null)
         {
-            string link = "https://discordapp.com/oauth2/authorize?client_id=" + ClientID.Password + @"&scope=bot";
+            string link = "https://discordapp.com/oauth2/authorize?client_id=" + Settings.ClientID + @"&scope=bot";
             Clipboard.SetText(link);
             await Console.Log("Copied link to clipboard: " + link);
         }
