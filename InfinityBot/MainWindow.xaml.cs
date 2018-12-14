@@ -349,7 +349,11 @@ namespace InfinityBot
             }
         }
 
-        private void TrayIcon_ShowWindow(object sender, EventArgs e) => Show();
+        private void TrayIcon_ShowWindow(object sender, EventArgs e)
+        {
+            Show();
+            WindowState = WindowState.Normal;
+        }
 
         #endregion
     }
