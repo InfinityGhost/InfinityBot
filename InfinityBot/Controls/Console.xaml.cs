@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -106,11 +107,22 @@ namespace InfinityBot.Controls
         /// <summary>
         /// Controls if the console saves to the log.
         /// </summary>
+        [Bindable(true)]
+        [Category("Common")]
         public bool LoggingEnabled
         {
-            get => LogBox.IsChecked;
-            set => LogBox.IsChecked = value;
+            get
+            {
+                return (bool)GetValue(LoggingEnabledProperty);
+            }
+            set
+            {
+                SetValue(LoggingEnabledProperty, value);
+            }
         }
+
+        public static readonly DependencyProperty LoggingEnabledProperty = DependencyProperty.Register(
+            "LoggingEnabled", typeof(bool), typeof(Console), new PropertyMetadata(false));
 
         #endregion
 
@@ -146,6 +158,7 @@ namespace InfinityBot.Controls
             await Dispatcher.BeginInvoke(new Action(() =>
             {
                 TextBlock.Text = string.Empty;
+                
             }));
         }
 
