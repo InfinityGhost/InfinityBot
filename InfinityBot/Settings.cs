@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.IO;
 using static InfinityBot.Tools.ReadHelper;
 
@@ -26,7 +22,7 @@ namespace InfinityBot
         public async void Save() => await Save(Path);
         public Task Save(string path)
         {
-            File.WriteAllLines(path, new List<string>
+            File.WriteAllLines(path, new string[]
             {
                 "apiToken" + Splitter + APIToken,
                 "clientID" + Splitter + ClientID,
