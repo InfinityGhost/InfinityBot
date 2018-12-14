@@ -231,7 +231,7 @@
     </Compile>
     <Compile Include="Information.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="Tools\ReadHelper.cs" />
+    <Compile Include="Tools\ReadExtensions.cs" />
     <Compile Include="TrayIcon.cs" />
     <Compile Include="Tools\TypeConverter.cs" />
     <Page Include="AboutBox.xaml">

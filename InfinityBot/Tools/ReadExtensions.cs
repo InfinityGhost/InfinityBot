@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace InfinityBot.Tools
 {
-    public static class ReadHelper
+    public static class ReadExtensions
     {
         public static string GetProperty(this IEnumerable<string> contents, string objectName, string separator = ":")
         {

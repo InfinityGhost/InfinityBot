@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.IO;
-using static InfinityBot.Tools.ReadHelper;
+using static InfinityBot.Tools.ReadExtensions;
 
 namespace InfinityBot
 {
