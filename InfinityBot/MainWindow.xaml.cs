@@ -36,6 +36,12 @@ namespace InfinityBot
 
         async void Window_Loaded(object sender = null, EventArgs e = null)
         {
+            // Data Bindings
+            {
+                ChannelsBox.ItemsSource = ChannelsList;
+                ChannelDataGrid.ItemsSource = ChannelsList;
+            }
+
             try
             {
                 LoadDefault();
@@ -49,11 +55,8 @@ namespace InfinityBot
             if (System.Diagnostics.Debugger.IsAttached)
                 Title += " - Debugging";
 
-            ChannelsBox.ItemsSource = ChannelsList;
-            ChannelDataGrid.ItemsSource = ChannelsList;
             await TrayIcon.Initialize();
             TrayIcon.ShowWindow += TrayIcon_ShowWindow;
-
         }
 
         private Bot bot;
@@ -121,7 +124,7 @@ namespace InfinityBot
                 switch (key)
                 {
                     case Key.Down:
-                        if (index++ != ChannelsList.Count)
+                        if (index++ != ChannelsList.Count - 1)
                             ChannelsBox.SelectedIndex++;
                         break;
                     case Key.Up:
@@ -258,7 +261,8 @@ namespace InfinityBot
         {
             try
             {
-                List<string> fileContents = ChannelsList.Skip(1).ToList().ConvertAll(item => $"{item.Content},{item.Tag}");
+                List<ComboBoxItem> items = ChannelsList.Skip(1).SkipWhile(item => item == CollectionView.NewItemPlaceholder).ToList();
+                List<string> fileContents = items.ConvertAll(item => $"{item.Content},{item.Tag}");
                 File.WriteAllLines(Directory.GetCurrentDirectory() + @"\" + "channels.txt", fileContents);
                 await Console.Log("Saved all channels.");
             }
@@ -345,10 +349,7 @@ namespace InfinityBot
             }
         }
 
-        private void TrayIcon_ShowWindow(object sender, EventArgs e)
-        {
-            Show();
-        }
+        private void TrayIcon_ShowWindow(object sender, EventArgs e) => Show();
 
         #endregion
     }

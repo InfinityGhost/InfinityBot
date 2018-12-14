@@ -12,6 +12,8 @@ namespace InfinityBot
 {
     public class Channels : List<ComboBoxItem>
     {
+        public Channels() => Clear();
+
         #region Class Methods
 
         public void Add(SocketGuildChannel channel) => base.Add(ConvertChannel(channel));
@@ -43,16 +45,12 @@ namespace InfinityBot
         public new void Clear()
         {
             base.Clear();
-            base.Add(new ComboBoxItem
-            {
-                Content = "- Reply in recent msg channel -",
-                Tag = "-1",
-            });
+            base.Add(DefaultObject);
         }
 
         #endregion
 
-        #region Static Methods
+        #region Static Methods / Objects
 
         public static ComboBoxItem ConvertChannel(SocketGuildChannel channel)
         {
@@ -64,6 +62,12 @@ namespace InfinityBot
         }
 
         public static string GetName(SocketGuildChannel channel) => $"{channel.Guild.Name}/#{channel.Name}";
+
+        public static ComboBoxItem DefaultObject => new ComboBoxItem
+        {
+            Content = "- Reply in recent msg channel -",
+            Tag = "-1",
+        };
 
         #endregion
     }
