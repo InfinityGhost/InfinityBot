@@ -109,14 +109,19 @@ namespace InfinityBot
 
         private async void Message(object sender, string message = null)
         {
-            if (message != null)
+            if (bot != null)
             {
-                string id = (string)(ChannelsBox.SelectedItem as ComboBoxItem).Tag;
-                if (id == "-1")
-                    await bot.ReplyToMessage(message);
-                else
-                    await bot.ServerMessage(message, bot.GetChannel(Convert.ToUInt64(id)));
+                if (message != null)
+                {
+                    string id = (string)(ChannelsBox.SelectedItem as ComboBoxItem).Tag;
+                    if (id == "-1")
+                        await bot.ReplyToMessage(message);
+                    else
+                        await bot.ServerMessage(message, bot.GetChannel(Convert.ToUInt64(id)));
+                }
             }
+            else
+                await Console.Log("Bot is not started.");
         }
 
         private async void MessageBoxKey(object sender, Key key)
