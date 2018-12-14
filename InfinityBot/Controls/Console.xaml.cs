@@ -26,20 +26,46 @@ namespace InfinityBot.Controls
             InitializeComponent();
         }
 
+        /// <summary>
+        /// The status output from the console.
+        /// </summary>
         public event EventHandler<string> Status;
 
+        /// <summary>
+        /// Message sent through the message box.
+        /// </summary>
         public event EventHandler<string> Message;
+
+        /// <summary>
+        /// The last key pressed in the message box.
+        /// </summary>
         public event EventHandler<Key> BoxKey;
 
+        /// <summary>
+        /// The prefix for console message output.
+        /// </summary>
         private static string Prefix => DateTime.Now.ToLocalTime() + ": ";
+
+        /// <summary>
+        /// The path for the log file.
+        /// </summary>
         private static string LogPath => Directory.GetCurrentDirectory() + @"\" + "log.log";
         
+        /// <summary>
+        /// Object used to lock the log in order to write the to the log.
+        /// </summary>
         private static object WriteLocker = new object();
 
         #region Properties
 
+        /// <summary>
+        /// Returns whether the console is empty.
+        /// </summary>
         public bool IsEmpty => TextBlock.Text == string.Empty || TextBlock.Text == null;
 
+        /// <summary>
+        /// Controls the visibility of the horizontal scroll bar.
+        /// </summary>
         public bool HorizontalScrollbarEnabled
         {
             set
@@ -57,6 +83,9 @@ namespace InfinityBot.Controls
             get => ScrollViewer.HorizontalScrollBarVisibility == ScrollBarVisibility.Auto;
         }
 
+        /// <summary>
+        /// Controls the visibility of the vertical scroll bar.
+        /// </summary>
         public bool VerticalScrollbarEnabled
         {
             set
@@ -74,6 +103,9 @@ namespace InfinityBot.Controls
             get => ScrollViewer.VerticalScrollBarVisibility == ScrollBarVisibility.Auto;
         }
 
+        /// <summary>
+        /// Controls if the console saves to the log.
+        /// </summary>
         public bool LoggingEnabled
         {
             get => LogBox.IsChecked;
@@ -84,6 +116,10 @@ namespace InfinityBot.Controls
 
         #region Public Methods
 
+        /// <summary>
+        /// Writes text to the console buffer.
+        /// </summary>
+        /// <param name="text">The text to write to the console.</param>
         public async Task Log(string text)
         {
             await Dispatcher.BeginInvoke(new Action( async () =>
@@ -102,6 +138,9 @@ namespace InfinityBot.Controls
 
         public async void Log(object sender, string text) => await Log(text);
 
+        /// <summary>
+        /// Clears the console buffer.
+        /// </summary>
         public async Task Clear()
         {
             await Dispatcher.BeginInvoke(new Action(() =>
@@ -110,13 +149,20 @@ namespace InfinityBot.Controls
             }));
         }
 
+        /// <summary>
+        /// Copies all of the text from the console buffer.
+        /// </summary>
         public Task Copy()
         {
             Clipboard.SetText(TextBlock.Text);
             return Task.CompletedTask; 
         }
 
-        public Task WriteLog(string text)
+        /// <summary>
+        /// Writes text to the console's log file.
+        /// </summary>
+        /// <param name="text">The text to log.</param>
+        private Task WriteLog(string text)
         {
             lock (WriteLocker)
             {
@@ -127,7 +173,6 @@ namespace InfinityBot.Controls
                 }
             }
             return Task.CompletedTask;
-            //await File.AppendText(LogPath).WriteLineAsync(text);
         }
 
         #endregion
