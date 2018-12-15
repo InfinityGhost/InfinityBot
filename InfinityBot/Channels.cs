@@ -58,14 +58,11 @@ namespace InfinityBot
 
         #region Static Methods / Objects
 
-        public static ComboBoxItem ConvertChannel(SocketGuildChannel channel)
+        public static ComboBoxItem ConvertChannel(SocketGuildChannel channel) => new ComboBoxItem
         {
-            return new ComboBoxItem
-            {
-                Content = GetName(channel),
-                Tag = channel.Id,
-            };
-        }
+            Content = GetName(channel),
+            Tag = channel.Id,
+        };
 
         public static string GetName(SocketGuildChannel channel) => $"{channel.Guild.Name}/#{channel.Name}";
 

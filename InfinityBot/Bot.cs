@@ -28,7 +28,6 @@ namespace InfinityBot
         public DiscordSocketClient Client = new DiscordSocketClient();
         CommandService UserCommands = new CommandService();
         CommandService AdminCommands = new CommandService();
-        Commands.ServerCommands ServerCommands;
         IServiceProvider Services = new ServiceCollection().BuildServiceProvider();
 
         public SocketMessage ReplyMessage;
@@ -69,29 +68,23 @@ namespace InfinityBot
 
         public async Task ServerMessage(string text, SocketChannel socketChannel)
         {
-            if (!await HandleServerCommand(text))
+            if (socketChannel is SocketTextChannel channel)
             {
-                if (socketChannel is SocketTextChannel channel)
-                {
-                    if (text != string.Empty || text != null)
-                        await channel.SendMessageAsync(text);
-                    Channel = channel;
-                }
+                if (text != string.Empty || text != null)
+                    await channel.SendMessageAsync(text);
+                Channel = channel;
             }
         }
 
         public async Task ReplyToMessage(string text)
         {
-            if(!await HandleServerCommand(text))
+            if (ReplyMessage != null)
             {
-                if (ReplyMessage != null)
-                {
-                    await ServerMessage(text, ReplyMessage.Channel as SocketChannel);
-                    Channel = (ReplyMessage.Channel as SocketChannel);
-                }
-                else
-                    Output?.Invoke(ReplyMessage, "Message is null.");
+                await ServerMessage(text, ReplyMessage.Channel as SocketChannel);
+                Channel = (ReplyMessage.Channel as SocketChannel);
             }
+            else
+                Output?.Invoke(ReplyMessage, "There is no message to reply to.");
         }
 
         public async Task MessageDirect(string text, ulong channelID)
@@ -201,9 +194,6 @@ namespace InfinityBot
 
             Client.MessageReceived += HandleAdminCommand;
             await AdminCommands.AddModuleAsync(typeof(Commands.AdminCommands), Services);
-
-            ServerCommands = new Commands.ServerCommands();
-            ServerCommands.Output += ServerCommands_Output;
         }
 
         private void ServerCommands_Output(object sender, object e)
@@ -245,20 +235,6 @@ namespace InfinityBot
                 var reply = await context.Channel.SendMessageAsync("Error: " + result.ErrorReason);
                 await Task.Delay(Commands.UserCommands.Delay);
                 await reply.DeleteAsync();
-            }
-        }
-
-        private async Task<bool> HandleServerCommand(string messageParam)
-        {
-            if (messageParam.StartsWith("/"))
-            {
-                string command = messageParam.TrimStart('/');
-                await ServerCommands.ExecuteCommand(this, command);
-                return true;
-            }
-            else
-            {
-                return false;
             }
         }
 
