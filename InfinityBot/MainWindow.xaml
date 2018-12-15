@@ -9,6 +9,18 @@
         Title="InfinityBot" Height="500" Width="800" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
         StateChanged="Window_StateChanged">
+    <Window.Resources>
+        <RoutedCommand x:Key="RunBotCMD"/>
+    </Window.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource RunBotCMD}" Executed="StartBot"/>
+    </Window.CommandBindings>
+
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="R"
+                    Command="{StaticResource RunBotCMD}"/>
+    </Window.InputBindings>
     <Grid>
 
         <!--Menu-->
@@ -21,6 +33,7 @@
                 <MenuItem Header="Save default settings" Click="SaveDefaultsButton"/>
                 <MenuItem Header="Exit" Click="ExitButton"/>
             </MenuItem>
+            <MenuItem Header="Start Bot" Click="StartBot"/>
         </Menu>
 
         <!--TabControl-->
@@ -31,14 +44,13 @@
 
             <TabItem Header="Main">
                 <Grid>
-                    <GroupBox Header="Terminal" Margin="5,5,5,44">
+                    <GroupBox Header="Terminal" Margin="5,5,5,5">
                         <control:Console x:Name="Console"
-                                         Status="StatusUpdate" Message="Message" BoxKey="MessageBoxKey" LoggingEnabled="{Binding LoggingEnabled, Mode=TwoWay}"/>
+                                         Status="StatusUpdate" Message="Message" BoxKey="MessageBoxKey" 
+                                         LoggingEnabled="{Binding LoggingEnabled, Mode=TwoWay}" SelectedChannel="{Binding SelectedItem.Content, ElementName=ChannelsBox}"
+                                         />
                     </GroupBox>
-                    <Grid VerticalAlignment="Bottom" Height="44" Margin="10,0,10,0">
-                        <ComboBox x:Name="ChannelsBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" IsTabStop="False"/>
-                        <Button x:Name="StartButton" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Start Bot" Height="24" Width="100" Click="StartBot" IsTabStop="False"/>
-                    </Grid>
+                    <ComboBox x:Name="ChannelsBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" IsTabStop="False" Visibility="Hidden"/>
                 </Grid>
             </TabItem>
 

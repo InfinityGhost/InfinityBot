@@ -25,6 +25,7 @@ namespace InfinityBot.Controls
         public Console()
         {
             InitializeComponent();
+            DataContext = this;
         }
 
         /// <summary>
@@ -102,23 +103,20 @@ namespace InfinityBot.Controls
         /// <summary>
         /// Controls if the console saves to the log.
         /// </summary>
-        [Bindable(true)]
-        [Category("Common")]
+        [Bindable(true), Category("Common")]
         public bool LoggingEnabled
         {
-            get
-            {
-                return (bool)GetValue(LoggingEnabledProperty);
-            }
-            set
-            {
-                SetValue(LoggingEnabledProperty, value);
-            }
+            get => (bool)GetValue(LoggingEnabledProperty);
+            set => SetValue(LoggingEnabledProperty, value);
         }
 
-        public static readonly DependencyProperty LoggingEnabledProperty = DependencyProperty.Register(
-            "LoggingEnabled", typeof(bool), typeof(Console), new PropertyMetadata(false));
-
+        [Bindable(true), Category("Common")]
+        public string SelectedChannel
+        {
+            get => (string)GetValue(SelectedChannelProperty);
+            set => SetValue(SelectedChannelProperty, value);
+        }
+        
         #endregion
 
         #region Public Methods
@@ -199,6 +197,16 @@ namespace InfinityBot.Controls
         private async void Clear(object sender, EventArgs e) => await Clear();
         private async void Copy(object sender, EventArgs e) => await Copy();
         private void OpenLogFile(object sender, EventArgs e) => System.Diagnostics.Process.Start(LogPath);
+
+        #endregion
+
+        #region Dependency Properties
+
+        public static readonly DependencyProperty LoggingEnabledProperty = DependencyProperty.Register(
+            "LoggingEnabled", typeof(bool), typeof(Console));
+
+        public static readonly DependencyProperty SelectedChannelProperty = DependencyProperty.Register(
+            "SelectedChannel", typeof(string), typeof(Console));
 
         #endregion
     }

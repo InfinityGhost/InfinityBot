@@ -15,10 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
 using System.Reflection;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Clipboard = System.Windows.Clipboard; 
-using TextBox = System.Windows.Controls.TextBox;
-using System.Collections.ObjectModel;
 
 namespace InfinityBot
 {
@@ -47,11 +44,11 @@ namespace InfinityBot
             {
                 LoadDefault();
                 LoadChannels();
-                await Console.Log("Ready to start bot. Default settings loaded.");
+                await Console.Log("Ready to start Bot. Default settings loaded.");
             }
             catch
             {
-                await Console.Log("Ready to start bot.");
+                await Console.Log("Ready to start Bot.");
             }
             if (System.Diagnostics.Debugger.IsAttached)
                 Title += " - Debugging";
@@ -60,12 +57,12 @@ namespace InfinityBot
             TrayIcon.ShowWindow += TrayIcon_ShowWindow;
         }
 
-        private Bot bot;
-        private TrayIcon TrayIcon = new TrayIcon();
+        public Bot Bot { private set; get; }
+        public bool BotRunning { private set; get; }
 
+        private TrayIcon TrayIcon = new TrayIcon();
         private Settings Settings = new Settings();
 
-        readonly string SettingsVersion = "0.1.1";
         readonly string logFile = Directory.GetCurrentDirectory() + @"\" + "log.log";
         readonly string channelsFile = Directory.GetCurrentDirectory() + @"\" + "channels.txt";
         readonly string defaultsFile = Directory.GetCurrentDirectory() + @"\" + "defaults.cfg";
@@ -76,19 +73,14 @@ namespace InfinityBot
 
         async void StartBot(object sender = null, EventArgs e = null)
         {
-            if ((string)StartButton.Content == "Start Bot")
+            if (!BotRunning)
             {
-                StartButton.Content = "Stop Bot";
-                bot = new Bot(Settings.APIToken);
-
-                // Event handlers
-                {
-                    bot.Output += Console.Log;
-                }
-
+                BotRunning = !BotRunning;
+                Bot = new Bot(Settings.APIToken);
+                Bot.Output += Console.Log;
                 try
                 {
-                    await bot.Start();
+                    await Bot.Start();
                 }
                 catch(Exception ex)
                 {
@@ -97,9 +89,10 @@ namespace InfinityBot
             }
             else
             {
-                await bot.Stop();
-                bot = null;
-                StartButton.Content = "Start Bot";
+                await Bot.Stop();
+                Bot.Output -= Console.Log;
+                Bot = null;
+                BotRunning = !BotRunning;
             }
         }
 
@@ -109,19 +102,26 @@ namespace InfinityBot
 
         private async void Message(object sender, string message = null)
         {
-            if (bot != null)
+            try
             {
-                if (message != null)
+                if (Bot != null)
                 {
-                    string id = (string)(ChannelsBox.SelectedItem as ComboBoxItem).Tag;
-                    if (id == "-1")
-                        await bot.ReplyToMessage(message);
-                    else
-                        await bot.ServerMessage(message, bot.GetChannel(Convert.ToUInt64(id)));
+                    if (message != null)
+                    {
+                        string id = (string)(ChannelsBox.SelectedItem as ComboBoxItem).Tag;
+                        if (id == "-1")
+                            await Bot.ReplyToMessage(message);
+                        else
+                            await Bot.ServerMessage(message, Bot.GetChannel(Convert.ToUInt64(id)));
+                    }
                 }
+                else
+                    await Console.Log("Bot is not started.");
             }
-            else
-                await Console.Log("Bot is not started.");
+            catch(Discord.Net.HttpException)
+            {
+                await Console.Log("The bot lacks permission to send messages to this channel, or the channel does not exist.");
+            }
         }
 
         private async void MessageBoxKey(object sender, Key key)
@@ -132,7 +132,7 @@ namespace InfinityBot
                 switch (key)
                 {
                     case Key.Down:
-                        if (index++ != ChannelsList.Count - 1)
+                        if (index++ != ChannelsList.Count)
                             ChannelsBox.SelectedIndex++;
                         break;
                     case Key.Up:
@@ -253,7 +253,7 @@ namespace InfinityBot
 
         private void GetChannels(object sender, ulong e)
         {
-            var channels = bot.GetChannels(e).ToList();
+            var channels = Bot.GetChannels(e).ToList();
             channels.ForEach(item =>
             {
                 if (item != null)
@@ -263,7 +263,7 @@ namespace InfinityBot
 
         async void AddChannelUID(object sender, ulong e)
         {
-            var channel = bot.GetChannel(e);
+            var channel = Bot.GetChannel(e);
             ChannelsList.Add(channel);
             ChannelsBox.SelectedIndex = ChannelsList.Count - 1;
 

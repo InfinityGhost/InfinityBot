@@ -22,8 +22,18 @@
 
             </TextBlock>
         </ScrollViewer>
-        <TextBox Background="Black" Foreground="White" BorderBrush="#7FFFFFFF"
-                 VerticalAlignment="Bottom" Height="18"
+        <Border BorderThickness="1" BorderBrush="#FFABADB3"
+                VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                Width="200" Height="18">
+            <TextBlock x:Name="ChannelBox" Text="{Binding SelectedChannel}" 
+                       Background="Black" Foreground="White"
+                       TextAlignment="Center"/>
+        </Border>
+        <Border BorderThickness="1" BorderBrush="#FFABADB3"
+                VerticalAlignment="Bottom" Height="18"
+                Margin="199,0,0,0">
+            <TextBox Background="Black" Foreground="White" BorderThickness="0"
                  PreviewKeyDown="MessageBox_KeyDown"/>
+        </Border>
     </Grid>
 </UserControl>
