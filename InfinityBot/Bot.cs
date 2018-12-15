@@ -53,7 +53,7 @@ namespace InfinityBot
         public async Task Stop()
         {
             await Client.StopAsync();
-            Output(this, "Bot has been stopped.");
+            Output?.Invoke(this, "Bot has been stopped.");
         }
 
         private async Task Client_Ready()
@@ -90,7 +90,7 @@ namespace InfinityBot
                     Channel = (ReplyMessage.Channel as SocketChannel);
                 }
                 else
-                    Output(ReplyMessage, "Message is null.");
+                    Output?.Invoke(ReplyMessage, "Message is null.");
             }
         }
 
@@ -121,14 +121,14 @@ namespace InfinityBot
 
         private Task Log(string msg)
         {
-            Output(this, "Log: " + msg);
+            Output?.Invoke(this, "Log: " + msg);
             return Task.CompletedTask;
         }
 
         private Task Log(LogMessage msg)
         {
             if (msg.Message != null)
-                Output(this, "Log: " + msg.Message);
+                Output?.Invoke(this, "Log: " + msg.Message);
             return Task.CompletedTask;
         }
 
@@ -185,7 +185,7 @@ namespace InfinityBot
                 }
             }
             
-            Output(this, message);
+            Output?.Invoke(this, message);
 
             return Task.CompletedTask;
         }
@@ -198,21 +198,21 @@ namespace InfinityBot
         {
             Client.MessageReceived += HandleUserCommand;
             await UserCommands.AddModuleAsync(typeof(Commands.UserCommands), Services);
-            Output(UserCommands, "UserCommands installed.");
+            Output?.Invoke(UserCommands, "UserCommands installed.");
 
             Client.MessageReceived += HandleAdminCommand;
             await AdminCommands.AddModuleAsync(typeof(Commands.AdminCommands), Services);
-            Output(AdminCommands, "AdminCommands installed.");
+            Output?.Invoke(AdminCommands, "AdminCommands installed.");
 
             ServerCommands = new Commands.ServerCommands();
             ServerCommands.Output += ServerCommands_Output;
-            Output(ServerCommands, "ServerCommands installed.");
+            Output?.Invoke(ServerCommands, "ServerCommands installed.");
         }
 
         private void ServerCommands_Output(object sender, object e)
         {
             if (e is string x)
-                Output(sender, x);
+                Output?.Invoke(sender, x);
         }
 
         private async Task HandleUserCommand(SocketMessage messageParam)
