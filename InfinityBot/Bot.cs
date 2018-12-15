@@ -52,7 +52,6 @@ namespace InfinityBot
         public async Task Stop()
         {
             await Client.StopAsync();
-            Output?.Invoke(this, "Bot has been stopped.");
         }
 
         private async Task Client_Ready()
