@@ -38,6 +38,7 @@ namespace InfinityBot
                 ChannelsBox.ItemsSource = ChannelsList;
                 ChannelDataGrid.ItemsSource = ChannelsList;
                 TabCtrl.DataContext = Settings;
+                EnableLoggingItem.DataContext = Settings;
             }
 
             try
@@ -63,9 +64,9 @@ namespace InfinityBot
         private TrayIcon TrayIcon = new TrayIcon();
         private Settings Settings = new Settings();
 
-        readonly string logFile = Directory.GetCurrentDirectory() + @"\" + "log.log";
-        readonly string channelsFile = Directory.GetCurrentDirectory() + @"\" + "channels.txt";
-        readonly string defaultsFile = Directory.GetCurrentDirectory() + @"\" + "defaults.cfg";
+        readonly string LogPath = Directory.GetCurrentDirectory() + @"\" + "log.log";
+        readonly string ChannelsPath = Directory.GetCurrentDirectory() + @"\" + "channels.txt";
+        readonly string DefaultsPath = Directory.GetCurrentDirectory() + @"\" + "defaults.cfg";
 
         #endregion
 
@@ -164,8 +165,12 @@ namespace InfinityBot
                         Status.Foreground = DefaultText;
                     }
                 }
-            }));            
+            }));
+            if (Settings.LoggingEnabled)
+                await WriteLog(text);
         }
+
+
 
         public Brush ErrorText = new BrushConverter().ConvertFrom("#FFFFFF") as Brush;
         public Brush ErrorBG = new BrushConverter().ConvertFrom("#E81123") as Brush;
@@ -218,8 +223,8 @@ namespace InfinityBot
             }
         }
 
-        private async void SaveDefaults() => await Settings.Save(defaultsFile);
-        private async void LoadDefault() => await Settings.Load(defaultsFile);
+        private async void SaveDefaults() => await Settings.Save(DefaultsPath);
+        private async void LoadDefault() => await Settings.Load(DefaultsPath);
 
         // Channels
 
@@ -241,7 +246,7 @@ namespace InfinityBot
         private void LoadChannels(object sender = null, EventArgs e = null)
         {
             ChannelsList.Clear();
-            ChannelsList.AddFile(channelsFile);
+            ChannelsList.AddFile(ChannelsPath);
             ChannelsBox.SelectedIndex = 0;
         }
 
@@ -350,5 +355,31 @@ namespace InfinityBot
         }
 
         #endregion
+
+        #region Logging
+
+        /// <summary>
+        /// Writes text to the console's log file.
+        /// </summary>
+        /// <param name="text">The text to log.</param>
+        private Task WriteLog(string text)
+        {
+            try
+            {
+                File.AppendAllText(LogPath, Controls.Console.Prefix + text + Environment.NewLine);
+            }
+            catch
+            {
+                StatusUpdate(this, "Error: Unable to write to log.");
+            }
+            return Task.CompletedTask;
+        }
+
+        private void OpenLogFile(object sender = null, EventArgs e = null) => System.Diagnostics.Process.Start(LogPath);
+        private async void CopyConsole(object sender = null, EventArgs e = null) => await Console.Copy();
+
+
+        #endregion
+
     }
 }

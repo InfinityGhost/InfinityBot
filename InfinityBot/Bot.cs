@@ -198,15 +198,12 @@ namespace InfinityBot
         {
             Client.MessageReceived += HandleUserCommand;
             await UserCommands.AddModuleAsync(typeof(Commands.UserCommands), Services);
-            Output?.Invoke(UserCommands, "UserCommands installed.");
 
             Client.MessageReceived += HandleAdminCommand;
             await AdminCommands.AddModuleAsync(typeof(Commands.AdminCommands), Services);
-            Output?.Invoke(AdminCommands, "AdminCommands installed.");
 
             ServerCommands = new Commands.ServerCommands();
             ServerCommands.Output += ServerCommands_Output;
-            Output?.Invoke(ServerCommands, "ServerCommands installed.");
         }
 
         private void ServerCommands_Output(object sender, object e)

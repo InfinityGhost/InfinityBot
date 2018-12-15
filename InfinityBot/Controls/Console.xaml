@@ -13,10 +13,6 @@
                     <ContextMenu>
                         <MenuItem Header="Copy all" Click="Copy"/>
                         <MenuItem Header="Clear" Click="Clear"/>
-                        <MenuItem Header="Logging...">
-                            <MenuItem Header="Enable logging" IsCheckable="True" DataContext="{Binding}" IsChecked="{Binding LoggingEnabled}"/>
-                            <MenuItem Header="Open log" Click="OpenLogFile"/>
-                        </MenuItem>
                     </ContextMenu>
                 </TextBlock.ContextMenu>
 

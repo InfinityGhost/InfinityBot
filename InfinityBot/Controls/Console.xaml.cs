@@ -46,12 +46,7 @@ namespace InfinityBot.Controls
         /// <summary>
         /// The prefix for console message output.
         /// </summary>
-        private static string Prefix => DateTime.Now.ToLocalTime() + ": ";
-
-        /// <summary>
-        /// The path for the log file.
-        /// </summary>
-        private static string LogPath => Directory.GetCurrentDirectory() + @"\" + "log.log";
+        public static string Prefix => DateTime.Now.ToLocalTime() + ": ";
         
         #region Properties
 
@@ -100,16 +95,6 @@ namespace InfinityBot.Controls
             get => ScrollViewer.VerticalScrollBarVisibility == ScrollBarVisibility.Auto;
         }
 
-        /// <summary>
-        /// Controls if the console saves to the log.
-        /// </summary>
-        [Bindable(true), Category("Common")]
-        public bool LoggingEnabled
-        {
-            get => (bool)GetValue(LoggingEnabledProperty);
-            set => SetValue(LoggingEnabledProperty, value);
-        }
-
         [Bindable(true), Category("Common")]
         public string SelectedChannel
         {
@@ -119,7 +104,7 @@ namespace InfinityBot.Controls
         
         #endregion
 
-        #region Public Methods
+        #region Methods
 
         /// <summary>
         /// Writes text to the console buffer.
@@ -133,9 +118,6 @@ namespace InfinityBot.Controls
                     TextBlock.Text += Prefix + text;
                 else
                     TextBlock.Text += Environment.NewLine + Prefix + text;
-
-                if (LoggingEnabled)
-                    await WriteLog(Prefix + text);
             }));
 
             Status?.Invoke(this, text);
@@ -164,16 +146,6 @@ namespace InfinityBot.Controls
             return Task.CompletedTask; 
         }
 
-        /// <summary>
-        /// Writes text to the console's log file.
-        /// </summary>
-        /// <param name="text">The text to log.</param>
-        private Task WriteLog(string text)
-        {
-            File.AppendAllText(LogPath, text + Environment.NewLine);
-            return Task.CompletedTask;
-        }
-
         #endregion
 
         #region Message Box
@@ -196,14 +168,10 @@ namespace InfinityBot.Controls
 
         private async void Clear(object sender, EventArgs e) => await Clear();
         private async void Copy(object sender, EventArgs e) => await Copy();
-        private void OpenLogFile(object sender, EventArgs e) => System.Diagnostics.Process.Start(LogPath);
 
         #endregion
 
         #region Dependency Properties
-
-        public static readonly DependencyProperty LoggingEnabledProperty = DependencyProperty.Register(
-            "LoggingEnabled", typeof(bool), typeof(Console));
 
         public static readonly DependencyProperty SelectedChannelProperty = DependencyProperty.Register(
             "SelectedChannel", typeof(string), typeof(Console));

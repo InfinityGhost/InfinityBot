@@ -33,6 +33,11 @@
                 <MenuItem Header="Save default settings" Click="SaveDefaultsButton"/>
                 <MenuItem Header="Exit" Click="ExitButton"/>
             </MenuItem>
+            <MenuItem Header="Console">
+                <MenuItem Header="Copy buffer" Click="CopyConsole"/>
+                <MenuItem Header="Enable logging" IsCheckable="True" IsChecked="{Binding LoggingEnabled, Mode=TwoWay}" x:Name="EnableLoggingItem"/>
+                <MenuItem Header="Open log file" Click="OpenLogFile"/>
+            </MenuItem>
             <MenuItem Header="Start Bot" Click="StartBot"/>
         </Menu>
 
@@ -44,11 +49,10 @@
 
             <TabItem Header="Main">
                 <Grid>
-                    <GroupBox Header="Terminal" Margin="5,5,5,5">
+                    <GroupBox Header="Console" Margin="5,5,5,5">
                         <control:Console x:Name="Console"
-                                         Status="StatusUpdate" Message="Message" BoxKey="MessageBoxKey" 
-                                         LoggingEnabled="{Binding LoggingEnabled, Mode=TwoWay}" SelectedChannel="{Binding SelectedItem.Content, ElementName=ChannelsBox}"
-                                         />
+                                         Status="StatusUpdate" Message="Message" BoxKey="MessageBoxKey"
+                                         SelectedChannel="{Binding SelectedItem.Content, ElementName=ChannelsBox}"/>
                     </GroupBox>
                     <ComboBox x:Name="ChannelsBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" IsTabStop="False" Visibility="Hidden"/>
                 </Grid>
