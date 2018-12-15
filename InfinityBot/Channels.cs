@@ -42,6 +42,12 @@ namespace InfinityBot
             });
         }
 
+        public void AddRange(IEnumerable<SocketGuildChannel> channels)
+        {
+            List<ComboBoxItem> items = channels.ToList().ConvertAll(e => ConvertChannel(e));
+            base.AddRange(items);
+        }
+
         public new void Clear()
         {
             base.Clear();
@@ -56,7 +62,7 @@ namespace InfinityBot
         {
             return new ComboBoxItem
             {
-                Content = channel.Name,
+                Content = GetName(channel),
                 Tag = channel.Id,
             };
         }

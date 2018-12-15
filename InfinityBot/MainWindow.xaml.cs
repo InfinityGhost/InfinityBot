@@ -116,11 +116,11 @@ namespace InfinityBot
                     }
                 }
                 else
-                    await Console.Log("Bot is not started.");
+                    await Console.Log("Error: Bot is not started.");
             }
             catch(Discord.Net.HttpException)
             {
-                await Console.Log("The bot lacks permission to send messages to this channel, or the channel does not exist.");
+                await Console.Log("Error: The bot lacks permission to send messages to this channel, or the channel does not exist.");
             }
         }
 
@@ -271,6 +271,34 @@ namespace InfinityBot
         }
 
         private void ClearChannels(object sender = null, EventArgs e = null) => ChannelsList.Clear();
+
+        private async void ChannelControlBox_Command(object sender, string e)
+        {
+            if (Bot != null)
+            {
+                var vs = e.Split(',');
+                switch (vs.First())
+                {
+                    case "AddChannel":
+                        ChannelsList.Add(Bot.GetChannel(Convert.ToUInt64(vs[1])));
+                        await Console.Log("Added channel.");
+                        break;
+                    case "AddGuild":
+                        try
+                        {
+                            ChannelsList.AddRange(Bot.GetChannels(Convert.ToUInt64(vs[1])));
+                        }
+                        catch
+                        {
+                            await Console.Log("Error: Invalid ID.");
+                        }
+                        await Console.Log("Added channels.");
+                        break;
+                }
+            }
+            else
+                await Console.Log("Error: Bot is not started.");
+        }
 
         #endregion
 

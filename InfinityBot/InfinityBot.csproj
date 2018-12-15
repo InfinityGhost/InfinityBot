@@ -226,6 +226,9 @@
       <DependentUpon>AboutBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="Channels.cs" />
+    <Compile Include="Controls\ChannelControlBox.xaml.cs">
+      <DependentUpon>ChannelControlBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Console.xaml.cs">
       <DependentUpon>Console.xaml</DependentUpon>
     </Compile>
@@ -237,6 +240,10 @@
     <Page Include="AboutBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ChannelControlBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\Console.xaml">
       <SubType>Designer</SubType>

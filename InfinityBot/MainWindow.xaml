@@ -87,11 +87,16 @@
                         </GroupBox>
                         <Button Content="Get invite link" Click="GetInvite"/>
                     </StackPanel>
-                    <GroupBox Header="Channels" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="52">
-                        <StackPanel Orientation="Horizontal">
-                            <Button Content="Save channels" Click="SaveChannels"/>
-                            <Button Content="Load channels" Click="LoadChannels"/>
-                            <Button Content="Reset channels" Click="ClearChannels"/>
+                    <GroupBox Header="Channels" VerticalAlignment="Bottom" Height="auto">
+                        <StackPanel>
+                            <GroupBox Header="Channel Management" HorizontalAlignment="Center" VerticalAlignment="Bottom" Height="52">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Save channels" Click="SaveChannels"/>
+                                    <Button Content="Load channels" Click="LoadChannels"/>
+                                    <Button Content="Reset channels" Click="ClearChannels"/>
+                                </StackPanel>
+                            </GroupBox>
+                            <control:ChannelControlBox Margin="5" Command="ChannelControlBox_Command"/>
                         </StackPanel>
                     </GroupBox>
                 </Grid>

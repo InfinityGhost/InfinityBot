@@ -105,12 +105,12 @@ namespace InfinityBot
             return Client.GetChannel(channelID) as SocketGuildChannel ?? null;
         }
 
-        public SocketGuildChannel[] GetChannels(ulong guildID)
+        public IEnumerable<SocketGuildChannel> GetChannels(ulong guildID)
         {
             SocketGuild guild = Client.GetGuild(guildID) ?? null;
 
             if (guild != null)
-                return guild.Channels.Where(channel => channel is SocketTextChannel).ToArray();
+                return guild.Channels.Where(channel => channel is SocketTextChannel);
             else
                 throw new ArgumentException();
         }

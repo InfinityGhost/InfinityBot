@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="InfinityBot.Controls.ChannelControlBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:InfinityBot.Controls"
+             mc:Ignorable="d" 
+             d:DesignWidth="800" d:DesignHeight="44">
+    <Grid>
+        <ComboBox x:Name="ComboBox" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Left" Width="200">
+            <ComboBoxItem Content="Add Channel (ID)" Tag="AddChannel"/>
+            <ComboBoxItem Content="Add Guild (ID)" Tag="AddGuild"/>
+        </ComboBox>
+        <TextBox Margin="210,0,0,0" VerticalAlignment="Center" Height="24" VerticalContentAlignment="Center" PreviewKeyDown="KeyPress"/>
+    </Grid>
+</UserControl>
