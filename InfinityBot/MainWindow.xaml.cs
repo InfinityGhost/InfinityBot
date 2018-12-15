@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 using System.Threading;
 using System.Reflection;
 using Clipboard = System.Windows.Clipboard; 
-
+    
 namespace InfinityBot
 {
     /// <summary>
@@ -132,7 +132,7 @@ namespace InfinityBot
                 switch (key)
                 {
                     case Key.Down:
-                        if (index++ != ChannelsList.Count)
+                        if (index++ != ChannelsList.Count - 1)
                             ChannelsBox.SelectedIndex++;
                         break;
                     case Key.Up:
