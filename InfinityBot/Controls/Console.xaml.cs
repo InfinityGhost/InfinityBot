@@ -52,11 +52,6 @@ namespace InfinityBot.Controls
         /// </summary>
         private static string LogPath => Directory.GetCurrentDirectory() + @"\" + "log.log";
         
-        /// <summary>
-        /// Object used to lock the log in order to write the to the log.
-        /// </summary>
-        private static object WriteLocker = new object();
-
         #region Properties
 
         /// <summary>
@@ -177,14 +172,7 @@ namespace InfinityBot.Controls
         /// <param name="text">The text to log.</param>
         private Task WriteLog(string text)
         {
-            lock (WriteLocker)
-            {
-                using (FileStream file = new FileStream(LogPath, FileMode.Append, FileAccess.Write, FileShare.Read))
-                using (StreamWriter writer = new StreamWriter(file, Encoding.Unicode))
-                {
-                    writer.Write(text);
-                }
-            }
+            File.AppendAllText(LogPath, text + Environment.NewLine);
             return Task.CompletedTask;
         }
 
